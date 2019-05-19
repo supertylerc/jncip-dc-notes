@@ -1,0 +1,37 @@
+root@vQFX-1> show iccp
+
+Redundancy Group Information for peer 10.0.0.1
+  TCP Connection       : Established
+  Liveliness Detection : Up
+  Redundancy Group ID          Status
+    100                         Up
+
+Client Application: lacpd
+  Redundancy Group IDs Joined: None
+
+Client Application: MCSNOOPD
+  Redundancy Group IDs Joined: None
+
+Client Application: l2ald_iccpd_client
+  Redundancy Group IDs Joined: None
+
+{master:0}
+
+root@vQFX-2> show iccp
+
+Redundancy Group Information for peer 10.0.0.0
+  TCP Connection       : Established
+  Liveliness Detection : Up
+  Redundancy Group ID          Status
+    100                         Up
+
+Client Application: lacpd
+  Redundancy Group IDs Joined: None
+
+Client Application: MCSNOOPD
+  Redundancy Group IDs Joined: None
+
+Client Application: l2ald_iccpd_client
+  Redundancy Group IDs Joined: None
+
+{master:0}

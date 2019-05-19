@@ -1,0 +1,30 @@
+root@vQFX-1> show lldp neighbors
+Local Interface    Parent Interface    Chassis Id          Port info          System Name
+xe-0/0/0           ae0                 02:05:86:71:68:00   xe-0/0/0           vQFX-2
+xe-0/0/1           ae0                 02:05:86:71:68:00   xe-0/0/1           vQFX-2
+xe-0/0/2           ae1                 02:05:86:71:bc:00   xe-0/0/2           vQFX-3
+xe-0/0/3           ae2                 02:05:86:71:c5:00   xe-0/0/3           vQFX-4
+{master:0}
+
+root@vQFX-2> show lldp neighbors
+Local Interface    Parent Interface    Chassis Id          Port info          System Name
+xe-0/0/4           ae1                 02:05:86:71:bc:00   xe-0/0/4           vQFX-3
+xe-0/0/5           ae2                 02:05:86:71:c5:00   xe-0/0/5           vQFX-4
+xe-0/0/1           ae0                 02:05:86:71:fa:00   xe-0/0/1           vQFX-1
+xe-0/0/0           ae0                 02:05:86:71:fa:00   xe-0/0/0           vQFX-1
+
+{master:0}
+
+root@vQFX-3> show lldp neighbors
+Local Interface    Parent Interface    Chassis Id          Port info          System Name
+xe-0/0/4           ae0                 02:05:86:71:68:00   xe-0/0/4           vQFX-2
+xe-0/0/2           ae0                 02:05:86:71:fa:00   xe-0/0/2           vQFX-1
+
+{master:0}
+
+root@vQFX-4> show lldp neighbors
+Local Interface    Parent Interface    Chassis Id          Port info          System Name
+xe-0/0/5           ae0                 02:05:86:71:68:00   xe-0/0/5           vQFX-2
+xe-0/0/3           ae0                 02:05:86:71:fa:00   xe-0/0/3           vQFX-1
+
+{master:0}

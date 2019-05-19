@@ -1,0 +1,20 @@
+root@vQFX-1> show ospf neighbor 
+Address          Interface              State     ID               Pri  Dead
+192.168.200.4    irb.2000               Full      4.4.4.4          128    30
+192.168.200.3    irb.2000               Full      2.2.2.2          128    36
+
+{master:0}
+
+root@vQFX-2> show ospf neighbor    
+Address          Interface              State     ID               Pri  Dead
+192.168.200.4    irb.2000               Full      4.4.4.4          128    32
+192.168.200.2    irb.2000               Full      1.1.1.1          128    34
+
+{master:0}
+
+root@vQFX-4> show ospf neighbor    
+Address          Interface              State     ID               Pri  Dead
+192.168.200.2    ae0.0                  Full      1.1.1.1          128    33
+192.168.200.3    ae0.0                  Full      2.2.2.2          128    39
+
+{master:0}

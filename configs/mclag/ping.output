@@ -1,0 +1,26 @@
+root@vQFX-3> ping 192.168.100.0 rapid count 5 
+PING 192.168.100.0 (192.168.100.0): 56 data bytes
+!!!!!
+--- 192.168.100.0 ping statistics ---
+5 packets transmitted, 5 packets received, 0% packet loss
+round-trip min/avg/max/stddev = 306.100/365.522/380.486/29.711 ms
+
+{master:0}
+
+root@vQFX-3> ping 192.168.200.4 rapid count 5    
+PING 192.168.200.4 (192.168.200.4): 56 data bytes
+!!!!!
+--- 192.168.200.4 ping statistics ---
+5 packets transmitted, 5 packets received, 0% packet loss
+round-trip min/avg/max/stddev = 239.258/425.293/601.453/129.111 ms
+
+{master:0}
+
+root@vQFX-4> ping 192.168.100.1 rapid count 5 
+PING 192.168.100.1 (192.168.100.1): 56 data bytes
+!!!!!
+--- 192.168.100.1 ping statistics ---
+5 packets transmitted, 5 packets received, 0% packet loss
+round-trip min/avg/max/stddev = 114.584/234.628/287.023/67.643 ms
+
+{master:0}

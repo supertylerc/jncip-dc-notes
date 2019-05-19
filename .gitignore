@@ -1,0 +1,7 @@
+# Ignore Sphinx dirs
+_build/
+_static/
+_templates/
+
+# Ignore vscode
+.vscode/
