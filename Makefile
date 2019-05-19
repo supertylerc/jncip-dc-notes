@@ -20,6 +20,7 @@ publish: html
 	rm -rf docs/*
 	mv _build/html/* docs/
 	for i in `ls docs/*.html`; do sed -i -e 's/_static/static/g' $$i; done
+	echo "jncip-dc.tylerc.me" > docs/CNAME
 	git add .
 	git commit
 
