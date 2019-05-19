@@ -13,6 +13,15 @@ help:
 
 .PHONY: help Makefile
 
+html:
+	@$(SPHINXBUILD) -M html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+
+publish: html
+	rm -rf docs/*
+	mv _build/html/* docs/
+	git add .
+	git commit
+
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
 %: Makefile

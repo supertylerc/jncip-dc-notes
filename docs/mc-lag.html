@@ -1,0 +1,1132 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Multi-Chassis LAG (MC-LAG) &#8212; jncip-dc-notes  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="&lt;no title&gt;" href="dc-deployment-and-management.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="multi-chassis-lag-mc-lag">
+<h1>Multi-Chassis LAG (MC-LAG)<a class="headerlink" href="#multi-chassis-lag-mc-lag" title="Permalink to this headline">¶</a></h1>
+<p>Multi-Chassis LAG is a technology that allows two independent systems
+to present themselves as a single system while still operating
+indepedently.  This is in contrast to Virtual Chassis, which makes
+multiple independent systems operate as a single system.  At the highest
+level, MC-LAG works by forcing the two upstream devices to use the same
+LACP System ID, which makes the downstream device think that the
+upstream devices are just one device.</p>
+<p>Before diving into the specifics of an MC-LAG configuration, it is
+critical to know which settings <em>must match</em> and which settings <em>must be
+unique</em> between peers.  The following section describes which must match
+and which must be unique <a class="footnote-reference brackets" href="#f1" id="id1">1</a>.</p>
+<p>Must match:</p>
+<ul class="simple">
+<li><p>LACP System ID</p></li>
+<li><p>LACP Admin Key</p></li>
+<li><p>MCAE ID</p></li>
+<li><p>MCAE Mode</p></li>
+<li><p>VLANs</p></li>
+<li><p>Redundancy Group ID <a class="footnote-reference brackets" href="#f2" id="id2">2</a></p></li>
+<li><p>Service ID <a class="footnote-reference brackets" href="#f2" id="id3">2</a></p></li>
+</ul>
+<p>Must be unique:</p>
+<ul class="simple">
+<li><p>MCAE Chassis ID</p></li>
+<li><p>MCAE Status Control</p></li>
+<li><p>Local ICCP IP</p></li>
+<li><p>Peer ICCP IP</p></li>
+<li><p>MC-LAG Protection</p></li>
+</ul>
+<p>Finally, a diagram is worth a thousand words.  If you have the Juniper
+MX Series book from O’Reilly <a class="footnote-reference brackets" href="#f4" id="id4">4</a>, I can highly recommend Figure 9-4
+as a reference.  I won’t reproduce it here because that would be
+incredibly rude and inconsiderate, so please pick up that book if you
+can.  Chapter 9, MC-LAG, is definitely worth it!  Just in case you have
+a Safari subscription,
+<a class="reference external" href="https://learning.oreilly.com/library/view/juniper-mx-series/9781491932711/ch09.html#iccp_hierarchy-id00050">here’s a link straight to the diagram</a>.
+But again, definitely read the entire chapter.  It’s absolutely worth
+it.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>I’m hoping the authors don’t mind me including a link directly to the
+diagram in the Safari Online book.  But if you’re one of the authors
+or the publisher and want that removed, <em>please</em> reach out to me and
+let me know and I will gladly remove it.</p>
+</div>
+<div class="section" id="terminology">
+<h2>Terminology<a class="headerlink" href="#terminology" title="Permalink to this headline">¶</a></h2>
+<p>This section explains some of the terminology and configuration elements
+listed above. <a class="footnote-reference brackets" href="#f2" id="id5">2</a></p>
+<div class="section" id="service-id">
+<span id="id6"></span><h3>Service ID<a class="headerlink" href="#service-id" title="Permalink to this headline">¶</a></h3>
+<p>The Service ID must match between two ICCP peers.  The Service ID exists
+for use cases where MC-LAG is used in more than one routing instance.
+This ID is global.</p>
+</div>
+<div class="section" id="redundancy-group-id">
+<span id="mcae-redundancy-group"></span><h3>Redundancy Group ID<a class="headerlink" href="#redundancy-group-id" title="Permalink to this headline">¶</a></h3>
+<p>The Redundancy Group ID must match between two ICCP peers.  It contains
+a grouping of MC-LAG bundles and their associated VLANs.  It is useful
+because it allows the ICCP peers to send an update once instead of
+sending an update for each MC-LAG.  For example, when a MAC address is
+learned, the MAC only needs to be sent to the ICCP peer one time for
+that redundancy group instead of multiple times for each MC-LAG in the
+group.  This ID is not required to be global, but can encompass one or
+more MC-LAG bundles.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In vQFX 18.1R1.9, on which this document is based, there can only be
+one Redundancy Group ID configured.  Although a list is supported,
+the <code class="docutils literal notranslate"><span class="pre">commit</span> <span class="pre">check</span></code> will fail with an error if more than one is
+provided.  This is probably because only one bridge domain is
+supported, and a Redundancy Group is a broadcast domain.  In the MX
+router, multiple Redundancy Group IDs are supported.</p>
+</div>
+</div>
+<div class="section" id="mcae-id">
+<span id="id7"></span><h3>MCAE ID<a class="headerlink" href="#mcae-id" title="Permalink to this headline">¶</a></h3>
+<p>The Multi-Chassis Aggregated Ethernet Identifier must match between
+peers.  This number must be unique per MC-LAG.</p>
+</div>
+<div class="section" id="mcae-chassis-id">
+<span id="id8"></span><h3>MCAE Chassis ID<a class="headerlink" href="#mcae-chassis-id" title="Permalink to this headline">¶</a></h3>
+<p>The MCAE Chassis ID uniquely identifies a chassis.  Therefore, this ID
+must be unique between ICCP peers.</p>
+</div>
+<div class="section" id="lacp-system-id">
+<span id="id9"></span><h3>LACP System ID<a class="headerlink" href="#lacp-system-id" title="Permalink to this headline">¶</a></h3>
+<p>This ID is used by LACP to identify the system to which a remote
+belongs.  This ID must match between peers.  It is used to “trick” the
+remote LACP peer into thinking it is talking to only one system.</p>
+</div>
+<div class="section" id="lacp-admin-key">
+<span id="id10"></span><h3>LACP Admin Key<a class="headerlink" href="#lacp-admin-key" title="Permalink to this headline">¶</a></h3>
+<p>This is used in conjunction with the LACP System ID to uniquely identify
+an LACP peer.  It must match between peers.</p>
+</div>
+<div class="section" id="mcae-mode">
+<span id="id11"></span><h3>MCAE Mode<a class="headerlink" href="#mcae-mode" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">active-active</span></code> or <code class="docutils literal notranslate"><span class="pre">active-standby</span></code>.  Must match between peers.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only <code class="docutils literal notranslate"><span class="pre">active-active</span></code> is supported on the QFX and EX Series.
+However, both <code class="docutils literal notranslate"><span class="pre">active-active</span></code> and <code class="docutils literal notranslate"><span class="pre">active-standby</span></code> are supported
+on the MX series with MPCs.  <code class="docutils literal notranslate"><span class="pre">active-active</span></code> with a DPC on an MX
+is not supported; you must use <code class="docutils literal notranslate"><span class="pre">active-standby</span></code> in those scenarios.
+<a class="footnote-reference brackets" href="#f3" id="id12">3</a></p>
+</div>
+</div>
+<div class="section" id="status-control">
+<span id="id13"></span><h3>Status Control<a class="headerlink" href="#status-control" title="Permalink to this headline">¶</a></h3>
+<p>Controls whether the node will be the active or standby node if ICCP
+fails.  Only two options exist: <code class="docutils literal notranslate"><span class="pre">active</span></code> or <code class="docutils literal notranslate"><span class="pre">standby</span></code>.  One node
+must be <code class="docutils literal notranslate"><span class="pre">active</span></code> and the other must be <code class="docutils literal notranslate"><span class="pre">standby</span></code>.  The <code class="docutils literal notranslate"><span class="pre">standby</span></code>
+node will change its <a class="reference internal" href="#lacp-system-id"><span class="std std-ref">LACP System ID</span></a>.</p>
+</div>
+<div class="section" id="mc-lag-protection">
+<span id="chassis-protection"></span><h3>MC-LAG Protection<a class="headerlink" href="#mc-lag-protection" title="Permalink to this headline">¶</a></h3>
+<p>Multi-chassis Link Protection ensures the appropriate behavior of the
+node configured as <a class="reference internal" href="#status-control"><span class="std std-ref">Status Control</span></a> <code class="docutils literal notranslate"><span class="pre">standby</span></code> when the ICL goes
+down.  For example, if the ICL goes down, should the <code class="docutils literal notranslate"><span class="pre">standby</span></code> node
+change its <a class="reference internal" href="#lacp-system-id"><span class="std std-ref">LACP System ID</span></a>, thereby taking its MC-LAG link down,
+or should it leave it as-is, making it actively receive traffic?  Link
+Protection uses an out-of-band mechanism to determine if the remote ICCP
+peer is still up or not.  If the ICL is down but the remote ICCP peer is
+still up, then the <code class="docutils literal notranslate"><span class="pre">standby</span></code> node will change its
+<a class="reference internal" href="#lacp-system-id"><span class="std std-ref">LACP System ID</span></a>.  However, if the ICL is down and the remote ICCP
+peer is also down, then the <code class="docutils literal notranslate"><span class="pre">standby</span></code> node will <em>not</em> change its
+<a class="reference internal" href="#lacp-system-id"><span class="std std-ref">LACP System ID</span></a>.  This will ensure that there is no outage.</p>
+</div>
+</div>
+<div class="section" id="guidelines">
+<h2>Guidelines<a class="headerlink" href="#guidelines" title="Permalink to this headline">¶</a></h2>
+<p>The follow sections describe high-level, general guidelines when
+deploying MC-LAG.  None of these recommendations are hard-and-fast
+rules, but they should be taken into consideration with any MC-LAG
+deployment.</p>
+<div class="section" id="inter-chassis-link-redundancy">
+<h3>Inter-Chassis Link Redundancy<a class="headerlink" href="#inter-chassis-link-redundancy" title="Permalink to this headline">¶</a></h3>
+<p>Although not required, it is strongly recommended that the ICL consist
+of at least two links.  This ICL link needs to have VLANs trunked across
+it.  It needs to have the downstream VLANs trunked plus the ICCP VLAN.
+The reason for trunking the downstream VLANs is in case one of the
+MC-LAG links goes down and traffic needs to go between the switches.</p>
+</div>
+<div class="section" id="compensating-for-lack-of-lacp-support">
+<h3>Compensating for Lack of LACP support<a class="headerlink" href="#compensating-for-lack-of-lacp-support" title="Permalink to this headline">¶</a></h3>
+<p>Generally speaking, your downstream LACP bundle will be a
+single-interface LAG per upstream device.  If the downstream device does
+not support LACP, you can use the <code class="docutils literal notranslate"><span class="pre">force-up</span></code> flag.  However, if the
+downstream device <em>does</em> support LACP, it is strongly recommended to use
+LACP and leave the <code class="docutils literal notranslate"><span class="pre">force-up</span></code> option off.</p>
+</div>
+<div class="section" id="layer-3-connectivity">
+<span id="id14"></span><h3>Layer 3 Connectivity<a class="headerlink" href="#layer-3-connectivity" title="Permalink to this headline">¶</a></h3>
+<p>For simple layer 3 connectivity, such as when the downstream device is a
+server, both of the upstream MC-LAG peers can have their gateways
+configured with the same IP address when <code class="docutils literal notranslate"><span class="pre">mcae-mac-synchronization</span></code> is
+enabled on the VLAN.  Unlike VRRP, this will keep traffic local to the
+switch that receives the packet.  This works by allowing one upstream
+switch to respond with the peer switch’s MAC address.  The end result is
+that each upstream switch treats a packet as if it is its own.
+<code class="docutils literal notranslate"><span class="pre">mcae-mac-synchronization</span></code> in this scenario is required because,
+without it, ARP requests are not sniffed or replicated by the peers.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>DHCP Relay is not supported with <code class="docutils literal notranslate"><span class="pre">mcae-mac-synchronization</span></code>.  If
+a DHCP Relay is required, you must use VRRP.</p>
+</div>
+<p>When routing protocols are required with an MC-LAG,
+<code class="docutils literal notranslate"><span class="pre">mcae-mac-synchronization</span></code> is no longer an option.  This is because
+the MAC synchronization option works similarly to an anycast service,
+but routing protocols require 1:1 direct relationships.  For this
+reason, when protocol adjacency is required (such as OSPF between the
+aggregation and core layers), VRRP is required.  In these instances, the
+devices should peer to the VRRP VIP, not the real IP.  To compensate for
+potential issues, a static ARP address for the <em>remote</em> peer’s IRB MAC
+and real IP should be configured.</p>
+</div>
+<div class="section" id="spanning-tree-protocol">
+<span id="stp"></span><h3>Spanning Tree Protocol<a class="headerlink" href="#spanning-tree-protocol" title="Permalink to this headline">¶</a></h3>
+<p>Although the goal of MC-LAG is to remove the need for a Spanning Tree
+Protocol, it is highly recommended that STP is enabled to prevent loops
+caused by miswiring as well as to prevent unintentional propagation of
+BPDUs.</p>
+<p>When configuring STP, disable STP on the ICL.  This is because STP could
+cause the traffic on the ICL to be blocked, thereby breaking the
+MC-LAGs.  Configure all MC-LAG interfaces as <code class="docutils literal notranslate"><span class="pre">edge</span></code>.  A downstream
+device should not be able to cause a loop in a properly designed
+network.  Turn on <code class="docutils literal notranslate"><span class="pre">bpdu-block-on-edge</span></code>.  This is to prevent malicious
+or unintentional BPDU propagation.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Do <em>not</em> configure MSTP or VSTP.  This can cause loops when not
+configured appropriately on all devices, including downstream
+devices. <a class="footnote-reference brackets" href="#f3" id="id15">3</a></p>
+</div>
+</div>
+</div>
+<div class="section" id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>In this example, there are four vQFX switches: vQFX-1 through vQFX-4.
+vQFX-1 and vQFX-2 are our MC-LAG head-end devices.  Their ICL is
+<code class="docutils literal notranslate"><span class="pre">ae0</span></code>, which consists of members <code class="docutils literal notranslate"><span class="pre">xe-0/0/0</span></code> and <code class="docutils literal notranslate"><span class="pre">xe-0/0/1</span></code>.</p>
+<p>They run an MC-LAG down to vQFX-3 on <code class="docutils literal notranslate"><span class="pre">ae1</span></code> and to vQFX-4 on <code class="docutils literal notranslate"><span class="pre">ae2</span></code>.
+<code class="docutils literal notranslate"><span class="pre">ae1</span></code> consists of <code class="docutils literal notranslate"><span class="pre">xe-0/0/2</span></code> on vQFX-1 and <code class="docutils literal notranslate"><span class="pre">xe-0/0/4</span></code> on vQFX-2.
+<code class="docutils literal notranslate"><span class="pre">ae2</span></code> is made up of <code class="docutils literal notranslate"><span class="pre">xe-0/0/3</span></code> on vQFX-1 and <code class="docutils literal notranslate"><span class="pre">xe-0/0/5</span></code> on vQFX-2.
+The interface numbers are the same on vQFX-3 and vQFX-4 as their
+upstream devices with the exception of the bundle interface.  On vQFX-3
+and vQFX-4, that is <code class="docutils literal notranslate"><span class="pre">ae0</span></code>.  You can see this below in the
+<code class="docutils literal notranslate"><span class="pre">show</span> <span class="pre">lldp</span> <span class="pre">neighbors</span></code> output for each device:</p>
+<div class="highlight-perl notranslate"><div class="highlight"><pre><span></span><span class="n">root</span><span class="nv">@vQFX</span><span class="o">-</span><span class="mi">1</span><span class="o">&gt;</span> <span class="n">show</span> <span class="n">lldp</span> <span class="n">neighbors</span>
+<span class="n">Local</span> <span class="n">Interface</span>    <span class="n">Parent</span> <span class="n">Interface</span>    <span class="n">Chassis</span> <span class="n">Id</span>          <span class="n">Port</span> <span class="n">info</span>          <span class="n">System</span> <span class="n">Name</span>
+<span class="hll"><span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">0</span>           <span class="n">ae0</span>                 <span class="mo">02</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mi">86</span><span class="p">:</span><span class="mi">71</span><span class="p">:</span><span class="mi">68</span><span class="p">:</span><span class="mo">00</span>   <span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">0</span>           <span class="n">vQFX</span><span class="o">-</span><span class="mi">2</span>
+</span><span class="hll"><span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">1</span>           <span class="n">ae0</span>                 <span class="mo">02</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mi">86</span><span class="p">:</span><span class="mi">71</span><span class="p">:</span><span class="mi">68</span><span class="p">:</span><span class="mo">00</span>   <span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">1</span>           <span class="n">vQFX</span><span class="o">-</span><span class="mi">2</span>
+</span><span class="hll"><span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">2</span>           <span class="n">ae1</span>                 <span class="mo">02</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mi">86</span><span class="p">:</span><span class="mi">71</span><span class="p">:</span><span class="n">bc:00</span>   <span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">2</span>           <span class="n">vQFX</span><span class="o">-</span><span class="mi">3</span>
+</span><span class="hll"><span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">3</span>           <span class="n">ae2</span>                 <span class="mo">02</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mi">86</span><span class="p">:</span><span class="mi">71</span><span class="p">:</span><span class="n">c5:00</span>   <span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">3</span>           <span class="n">vQFX</span><span class="o">-</span><span class="mi">4</span>
+</span><span class="p">{</span><span class="n">master:0</span><span class="p">}</span>
+
+<span class="n">root</span><span class="nv">@vQFX</span><span class="o">-</span><span class="mi">2</span><span class="o">&gt;</span> <span class="n">show</span> <span class="n">lldp</span> <span class="n">neighbors</span>
+<span class="n">Local</span> <span class="n">Interface</span>    <span class="n">Parent</span> <span class="n">Interface</span>    <span class="n">Chassis</span> <span class="n">Id</span>          <span class="n">Port</span> <span class="n">info</span>          <span class="n">System</span> <span class="n">Name</span>
+<span class="hll"><span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">4</span>           <span class="n">ae1</span>                 <span class="mo">02</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mi">86</span><span class="p">:</span><span class="mi">71</span><span class="p">:</span><span class="n">bc:00</span>   <span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">4</span>           <span class="n">vQFX</span><span class="o">-</span><span class="mi">3</span>
+</span><span class="hll"><span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">5</span>           <span class="n">ae2</span>                 <span class="mo">02</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mi">86</span><span class="p">:</span><span class="mi">71</span><span class="p">:</span><span class="n">c5:00</span>   <span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">5</span>           <span class="n">vQFX</span><span class="o">-</span><span class="mi">4</span>
+</span><span class="hll"><span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">1</span>           <span class="n">ae0</span>                 <span class="mo">02</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mi">86</span><span class="p">:</span><span class="mi">71</span><span class="p">:</span><span class="n">fa:00</span>   <span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">1</span>           <span class="n">vQFX</span><span class="o">-</span><span class="mi">1</span>
+</span><span class="hll"><span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">0</span>           <span class="n">ae0</span>                 <span class="mo">02</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mi">86</span><span class="p">:</span><span class="mi">71</span><span class="p">:</span><span class="n">fa:00</span>   <span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">0</span>           <span class="n">vQFX</span><span class="o">-</span><span class="mi">1</span>
+</span>
+<span class="p">{</span><span class="n">master:0</span><span class="p">}</span>
+
+<span class="n">root</span><span class="nv">@vQFX</span><span class="o">-</span><span class="mi">3</span><span class="o">&gt;</span> <span class="n">show</span> <span class="n">lldp</span> <span class="n">neighbors</span>
+<span class="n">Local</span> <span class="n">Interface</span>    <span class="n">Parent</span> <span class="n">Interface</span>    <span class="n">Chassis</span> <span class="n">Id</span>          <span class="n">Port</span> <span class="n">info</span>          <span class="n">System</span> <span class="n">Name</span>
+<span class="hll"><span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">4</span>           <span class="n">ae0</span>                 <span class="mo">02</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mi">86</span><span class="p">:</span><span class="mi">71</span><span class="p">:</span><span class="mi">68</span><span class="p">:</span><span class="mo">00</span>   <span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">4</span>           <span class="n">vQFX</span><span class="o">-</span><span class="mi">2</span>
+</span><span class="hll"><span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">2</span>           <span class="n">ae0</span>                 <span class="mo">02</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mi">86</span><span class="p">:</span><span class="mi">71</span><span class="p">:</span><span class="n">fa:00</span>   <span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">2</span>           <span class="n">vQFX</span><span class="o">-</span><span class="mi">1</span>
+</span>
+<span class="p">{</span><span class="n">master:0</span><span class="p">}</span>
+
+<span class="n">root</span><span class="nv">@vQFX</span><span class="o">-</span><span class="mi">4</span><span class="o">&gt;</span> <span class="n">show</span> <span class="n">lldp</span> <span class="n">neighbors</span>
+<span class="n">Local</span> <span class="n">Interface</span>    <span class="n">Parent</span> <span class="n">Interface</span>    <span class="n">Chassis</span> <span class="n">Id</span>          <span class="n">Port</span> <span class="n">info</span>          <span class="n">System</span> <span class="n">Name</span>
+<span class="hll"><span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">5</span>           <span class="n">ae0</span>                 <span class="mo">02</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mi">86</span><span class="p">:</span><span class="mi">71</span><span class="p">:</span><span class="mi">68</span><span class="p">:</span><span class="mo">00</span>   <span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">5</span>           <span class="n">vQFX</span><span class="o">-</span><span class="mi">2</span>
+</span><span class="hll"><span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">3</span>           <span class="n">ae0</span>                 <span class="mo">02</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mi">86</span><span class="p">:</span><span class="mi">71</span><span class="p">:</span><span class="n">fa:00</span>   <span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">3</span>           <span class="n">vQFX</span><span class="o">-</span><span class="mi">1</span>
+</span>
+<span class="p">{</span><span class="n">master:0</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>The MC-LAG to vQFX-3 provides normal layer 3 gateway services.  We use
+MAC address synchronization here.  The MC-LAG toward vQFX-4, however,
+runs OSPF.  For this, we remove MAC address synchronization and
+implement VRRP with static ARP bindings.  See
+<a class="reference internal" href="#layer-3-connectivity"><span class="std std-ref">Layer 3 Connectivity</span></a> for more details about this.</p>
+<p>The final test will be pinging between vQFX-3 and vQFX-4’s <code class="docutils literal notranslate"><span class="pre">ae0</span></code>
+interfaces.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>I don’t have Visio or Omnigraffle, and I found making diagrams in
+anything else highly frustrating.  So for now, there are no diagrams.
+:(  However, if you’d like to contribute some, they would be greatly
+appreciated!</p>
+</div>
+<p>The very first thing to do with any LAG in Junos is to set the number of
+LAG interfaces:</p>
+<div class="highlight-perl notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="c1"># qfx1</span>
+</span><span class="n">chassis</span> <span class="p">{</span>                               
+    <span class="n">aggregated</span><span class="o">-</span><span class="n">devices</span> <span class="p">{</span>
+        <span class="n">ethernet</span> <span class="p">{</span>
+            <span class="n">device</span><span class="o">-</span><span class="n">count</span> <span class="mi">3</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-perl notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="c1"># qfx2</span>
+</span><span class="n">chassis</span> <span class="p">{</span>                               
+    <span class="n">aggregated</span><span class="o">-</span><span class="n">devices</span> <span class="p">{</span>
+        <span class="n">ethernet</span> <span class="p">{</span>
+            <span class="n">device</span><span class="o">-</span><span class="n">count</span> <span class="mi">3</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-perl notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="c1"># vQFX-3</span>
+</span><span class="n">chassis</span> <span class="p">{</span>                               
+    <span class="n">aggregated</span><span class="o">-</span><span class="n">devices</span> <span class="p">{</span>
+        <span class="n">ethernet</span> <span class="p">{</span>
+            <span class="n">device</span><span class="o">-</span><span class="n">count</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-perl notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="c1"># vQFX-4</span>
+</span><span class="n">chassis</span> <span class="p">{</span>                               
+    <span class="n">aggregated</span><span class="o">-</span><span class="n">devices</span> <span class="p">{</span>
+        <span class="n">ethernet</span> <span class="p">{</span>
+            <span class="n">device</span><span class="o">-</span><span class="n">count</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Next, we configure the <a class="reference internal" href="#service-id"><span class="std std-ref">Service ID</span></a> on the upstream devices:</p>
+<div class="highlight-perl notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="c1"># qfx1</span>
+</span><span class="n">switch</span><span class="o">-</span><span class="n">options</span> <span class="p">{</span>
+    <span class="n">service</span><span class="o">-</span><span class="n">id</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-perl notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="c1"># qfx2</span>
+</span><span class="n">switch</span><span class="o">-</span><span class="n">options</span> <span class="p">{</span>
+    <span class="n">service</span><span class="o">-</span><span class="n">id</span> <span class="mi">1</span><span class="p">;</span>                       
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Next, we’ll configure the ICL.  For redundancy, we’ll configure the ICL
+as an LACP bundle:</p>
+<div class="highlight-perl notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="c1"># qfx1</span>
+</span><span class="n">interfaces</span> <span class="p">{</span>
+    <span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">0</span> <span class="p">{</span>
+        <span class="n">ether</span><span class="o">-</span><span class="n">options</span> <span class="p">{</span>
+            <span class="mf">802.3</span><span class="n">ad</span> <span class="n">ae0</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">1</span> <span class="p">{</span>
+        <span class="n">ether</span><span class="o">-</span><span class="n">options</span> <span class="p">{</span>
+            <span class="mf">802.3</span><span class="n">ad</span> <span class="n">ae0</span><span class="p">;</span>                
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">ae0</span> <span class="p">{</span>
+        <span class="n">aggregated</span><span class="o">-</span><span class="n">ether</span><span class="o">-</span><span class="n">options</span> <span class="p">{</span>
+            <span class="n">lacp</span> <span class="p">{</span>
+                <span class="n">active</span><span class="p">;</span>
+                <span class="n">periodic</span> <span class="n">slow</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="n">unit</span> <span class="mi">0</span> <span class="p">{</span>
+            <span class="n">family</span> <span class="n">ethernet</span><span class="o">-</span><span class="n">switching</span> <span class="p">{</span>
+                <span class="n">interface</span><span class="o">-</span><span class="n">mode</span> <span class="n">trunk</span><span class="p">;</span>
+                <span class="n">vlan</span> <span class="p">{</span>
+                    <span class="n">members</span> <span class="n">all</span><span class="p">;</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-perl notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="c1"># qfx2</span>
+</span><span class="n">interfaces</span> <span class="p">{</span>
+    <span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">0</span> <span class="p">{</span>
+        <span class="n">ether</span><span class="o">-</span><span class="n">options</span> <span class="p">{</span>
+            <span class="mf">802.3</span><span class="n">ad</span> <span class="n">ae0</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">1</span> <span class="p">{</span>
+        <span class="n">ether</span><span class="o">-</span><span class="n">options</span> <span class="p">{</span>
+            <span class="mf">802.3</span><span class="n">ad</span> <span class="n">ae0</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">ae0</span> <span class="p">{</span>
+        <span class="n">aggregated</span><span class="o">-</span><span class="n">ether</span><span class="o">-</span><span class="n">options</span> <span class="p">{</span>
+            <span class="n">lacp</span> <span class="p">{</span>
+                <span class="n">active</span><span class="p">;</span>
+                <span class="n">periodic</span> <span class="n">slow</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="n">unit</span> <span class="mi">0</span> <span class="p">{</span>
+            <span class="n">family</span> <span class="n">ethernet</span><span class="o">-</span><span class="n">switching</span> <span class="p">{</span>
+                <span class="n">interface</span><span class="o">-</span><span class="n">mode</span> <span class="n">trunk</span><span class="p">;</span>
+                <span class="n">vlan</span> <span class="p">{</span>
+                    <span class="n">members</span> <span class="n">all</span><span class="p">;</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you have a device with different line cards/slots/ASICs, consider
+spreading your bundle members across them for greater resiliency.</p>
+</div>
+<p>Now that the ICL has its layer 1 and layer 2 configuration done, we need
+to ensure it can route packets for ICCP.  Since ICCP only requires
+TCP/IP connectivity to establish, this could be done between loopback
+interfaces.  However, for the example, we’ll just use an IRB interface.</p>
+<div class="highlight-perl notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="c1"># qfx1</span>
+</span><span class="n">interfaces</span> <span class="p">{</span>
+    <span class="n">irb</span> <span class="p">{</span>
+        <span class="n">unit</span> <span class="mi">100</span> <span class="p">{</span>
+            <span class="n">family</span> <span class="n">inet</span> <span class="p">{</span>
+                <span class="n">address</span> <span class="mf">10.0.0.0</span><span class="o">/</span><span class="mi">31</span><span class="p">;</span>    
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">vlans</span> <span class="p">{</span>
+    <span class="n">v100</span> <span class="p">{</span>
+        <span class="n">vlan</span><span class="o">-</span><span class="n">id</span> <span class="mi">100</span><span class="p">;</span>
+        <span class="n">l3</span><span class="o">-</span><span class="n">interface</span> <span class="n">irb</span><span class="mf">.100</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-perl notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="c1"># qfx2</span>
+</span><span class="n">interfaces</span> <span class="p">{</span>
+    <span class="n">irb</span> <span class="p">{</span>
+        <span class="n">unit</span> <span class="mi">100</span> <span class="p">{</span>
+            <span class="n">family</span> <span class="n">inet</span> <span class="p">{</span>
+                <span class="n">address</span> <span class="mf">10.0.0.1</span><span class="o">/</span><span class="mi">31</span><span class="p">;</span>    
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">vlans</span> <span class="p">{</span>
+    <span class="n">v100</span> <span class="p">{</span>
+        <span class="n">vlan</span><span class="o">-</span><span class="n">id</span> <span class="mi">100</span><span class="p">;</span>
+        <span class="n">l3</span><span class="o">-</span><span class="n">interface</span> <span class="n">irb</span><span class="mf">.100</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Next, we need to configure ICCP:</p>
+<div class="highlight-perl notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="c1"># qfx1</span>
+</span><span class="n">protocols</span> <span class="p">{</span>
+    <span class="n">iccp</span> <span class="p">{</span>
+        <span class="nb">local</span><span class="o">-</span><span class="n">ip</span><span class="o">-</span><span class="n">addr</span> <span class="mf">10.0.0.0</span><span class="p">;</span>         
+        <span class="n">peer</span> <span class="mf">10.0.0.1</span> <span class="p">{</span>
+            <span class="n">session</span><span class="o">-</span><span class="n">establishment</span><span class="o">-</span><span class="n">hold</span><span class="o">-</span><span class="nb">time</span> <span class="mi">50</span><span class="p">;</span>
+            <span class="n">redundancy</span><span class="o">-</span><span class="n">group</span><span class="o">-</span><span class="n">id</span><span class="o">-</span><span class="n">list</span> <span class="mi">100</span><span class="p">;</span>
+            <span class="n">liveness</span><span class="o">-</span><span class="n">detection</span> <span class="p">{</span>
+                <span class="n">minimum</span><span class="o">-</span><span class="n">receive</span><span class="o">-</span><span class="n">interval</span> <span class="mi">300</span><span class="p">;</span>
+                <span class="n">transmit</span><span class="o">-</span><span class="n">interval</span> <span class="p">{</span>
+                    <span class="n">minimum</span><span class="o">-</span><span class="n">interval</span> <span class="mi">300</span><span class="p">;</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-perl notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="c1"># qfx2</span>
+</span><span class="n">protocols</span> <span class="p">{</span>
+    <span class="n">iccp</span> <span class="p">{</span>
+        <span class="nb">local</span><span class="o">-</span><span class="n">ip</span><span class="o">-</span><span class="n">addr</span> <span class="mf">10.0.0.1</span><span class="p">;</span>
+        <span class="n">peer</span> <span class="mf">10.0.0.0</span> <span class="p">{</span>
+            <span class="n">session</span><span class="o">-</span><span class="n">establishment</span><span class="o">-</span><span class="n">hold</span><span class="o">-</span><span class="nb">time</span> <span class="mi">50</span><span class="p">;</span>
+            <span class="n">redundancy</span><span class="o">-</span><span class="n">group</span><span class="o">-</span><span class="n">id</span><span class="o">-</span><span class="n">list</span> <span class="mi">100</span><span class="p">;</span>
+            <span class="n">liveness</span><span class="o">-</span><span class="n">detection</span> <span class="p">{</span>
+                <span class="n">minimum</span><span class="o">-</span><span class="n">receive</span><span class="o">-</span><span class="n">interval</span> <span class="mi">300</span><span class="p">;</span>
+                <span class="n">transmit</span><span class="o">-</span><span class="n">interval</span> <span class="p">{</span>
+                    <span class="n">minimum</span><span class="o">-</span><span class="n">interval</span> <span class="mi">300</span><span class="p">;</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Note that we’re configuring BFD for faster failure detection in this
+example.  By default, this will create a new BFD session that runs on
+the control plane.  However, if your platform supports it and you are
+not running ICCP via loopback interfaces (and ICCP is using IPs that are
+directly connected), you can push this down to the PFE with the
+<code class="docutils literal notranslate"><span class="pre">set</span> <span class="pre">protocols</span> <span class="pre">iccp</span> <span class="pre">peer</span> <span class="pre">&lt;ip&gt;</span> <span class="pre">liveness-detection</span> <span class="pre">single-hop</span></code> command.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In production, a best practice would be to configure ICCP between the
+loopback interfaces to ensure the ICCP session stays up, even if the
+ICL is down.</p>
+</div>
+<p>At this point, everything has been done such that ICCP should come up.
+This can be verified with the <code class="docutils literal notranslate"><span class="pre">show</span> <span class="pre">iccp</span> <span class="pre">status</span></code> command:</p>
+<div class="highlight-perl notranslate"><div class="highlight"><pre><span></span><span class="n">root</span><span class="nv">@vQFX</span><span class="o">-</span><span class="mi">1</span><span class="o">&gt;</span> <span class="n">show</span> <span class="n">iccp</span>
+
+<span class="hll"><span class="n">Redundancy</span> <span class="n">Group</span> <span class="n">Information</span> <span class="k">for</span> <span class="n">peer</span> <span class="mf">10.0.0.1</span>
+</span><span class="hll">  <span class="n">TCP</span> <span class="n">Connection</span>       <span class="p">:</span> <span class="n">Established</span>
+</span><span class="hll">  <span class="n">Liveliness</span> <span class="n">Detection</span> <span class="p">:</span> <span class="n">Up</span>
+</span><span class="hll">  <span class="n">Redundancy</span> <span class="n">Group</span> <span class="n">ID</span>          <span class="n">Status</span>
+</span><span class="hll">    <span class="mi">100</span>                         <span class="n">Up</span>
+</span>
+<span class="n">Client</span> <span class="n">Application:</span> <span class="n">lacpd</span>
+  <span class="n">Redundancy</span> <span class="n">Group</span> <span class="n">IDs</span> <span class="n">Joined:</span> <span class="n">None</span>
+
+<span class="n">Client</span> <span class="n">Application:</span> <span class="n">MCSNOOPD</span>
+  <span class="n">Redundancy</span> <span class="n">Group</span> <span class="n">IDs</span> <span class="n">Joined:</span> <span class="n">None</span>
+
+<span class="n">Client</span> <span class="n">Application:</span> <span class="n">l2ald_iccpd_client</span>
+  <span class="n">Redundancy</span> <span class="n">Group</span> <span class="n">IDs</span> <span class="n">Joined:</span> <span class="n">None</span>
+
+<span class="p">{</span><span class="n">master:0</span><span class="p">}</span>
+
+<span class="n">root</span><span class="nv">@vQFX</span><span class="o">-</span><span class="mi">2</span><span class="o">&gt;</span> <span class="n">show</span> <span class="n">iccp</span>
+
+<span class="hll"><span class="n">Redundancy</span> <span class="n">Group</span> <span class="n">Information</span> <span class="k">for</span> <span class="n">peer</span> <span class="mf">10.0.0.0</span>
+</span><span class="hll">  <span class="n">TCP</span> <span class="n">Connection</span>       <span class="p">:</span> <span class="n">Established</span>
+</span><span class="hll">  <span class="n">Liveliness</span> <span class="n">Detection</span> <span class="p">:</span> <span class="n">Up</span>
+</span><span class="hll">  <span class="n">Redundancy</span> <span class="n">Group</span> <span class="n">ID</span>          <span class="n">Status</span>
+</span><span class="hll">    <span class="mi">100</span>                         <span class="n">Up</span>
+</span>
+<span class="n">Client</span> <span class="n">Application:</span> <span class="n">lacpd</span>
+  <span class="n">Redundancy</span> <span class="n">Group</span> <span class="n">IDs</span> <span class="n">Joined:</span> <span class="n">None</span>
+
+<span class="n">Client</span> <span class="n">Application:</span> <span class="n">MCSNOOPD</span>
+  <span class="n">Redundancy</span> <span class="n">Group</span> <span class="n">IDs</span> <span class="n">Joined:</span> <span class="n">None</span>
+
+<span class="n">Client</span> <span class="n">Application:</span> <span class="n">l2ald_iccpd_client</span>
+  <span class="n">Redundancy</span> <span class="n">Group</span> <span class="n">IDs</span> <span class="n">Joined:</span> <span class="n">None</span>
+
+<span class="p">{</span><span class="n">master:0</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Before going on, we have two minor things to finish up: configuring
+<a class="reference internal" href="#chassis-protection"><span class="std std-ref">MC-LAG Protection</span></a> and configuring <a class="reference internal" href="#stp"><span class="std std-ref">Spanning Tree Protocol</span></a>:</p>
+<div class="highlight-perl notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="c1"># qfx1</span>
+</span><span class="n">multi</span><span class="o">-</span><span class="n">chassis</span> <span class="p">{</span>
+    <span class="n">multi</span><span class="o">-</span><span class="n">chassis</span><span class="o">-</span><span class="n">protection</span> <span class="mf">10.0.0.1</span> <span class="p">{</span> 
+        <span class="n">interface</span> <span class="n">ae0</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">protocols</span> <span class="p">{</span>
+    <span class="n">rstp</span> <span class="p">{</span>
+        <span class="n">interface</span> <span class="n">ae0</span> <span class="p">{</span>
+            <span class="n">disable</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">interface</span> <span class="n">all</span> <span class="p">{</span>
+            <span class="n">mode</span> <span class="n">point</span><span class="o">-</span><span class="n">to</span><span class="o">-</span><span class="n">point</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">bpdu</span><span class="o">-</span><span class="n">block</span><span class="o">-</span><span class="n">on</span><span class="o">-</span><span class="n">edge</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-perl notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="c1"># qfx2</span>
+</span><span class="n">multi</span><span class="o">-</span><span class="n">chassis</span> <span class="p">{</span>
+    <span class="n">multi</span><span class="o">-</span><span class="n">chassis</span><span class="o">-</span><span class="n">protection</span> <span class="mf">10.0.0.0</span> <span class="p">{</span> 
+        <span class="n">interface</span> <span class="n">ae0</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">protocols</span> <span class="p">{</span>
+    <span class="n">rstp</span> <span class="p">{</span>
+        <span class="n">interface</span> <span class="n">ae0</span> <span class="p">{</span>
+            <span class="n">disable</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">interface</span> <span class="n">all</span> <span class="p">{</span>
+            <span class="n">mode</span> <span class="n">point</span><span class="o">-</span><span class="n">to</span><span class="o">-</span><span class="n">point</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">bpdu</span><span class="o">-</span><span class="n">block</span><span class="o">-</span><span class="n">on</span><span class="o">-</span><span class="n">edge</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>All that’s left to finish our MC-LAG configuration is to start bringing
+up MCAEs!  First, we’ll work on the MC-LAG toward vQFX-3.</p>
+<div class="highlight-perl notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="c1"># qfx1</span>
+</span><span class="n">interfaces</span> <span class="p">{</span>
+    <span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">2</span> <span class="p">{</span>
+        <span class="n">ether</span><span class="o">-</span><span class="n">options</span> <span class="p">{</span>
+            <span class="mf">802.3</span><span class="n">ad</span> <span class="n">ae1</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">ae1</span> <span class="p">{</span>                               
+        <span class="n">aggregated</span><span class="o">-</span><span class="n">ether</span><span class="o">-</span><span class="n">options</span> <span class="p">{</span>
+            <span class="n">lacp</span> <span class="p">{</span>
+                <span class="n">active</span><span class="p">;</span>
+                <span class="n">periodic</span> <span class="n">slow</span><span class="p">;</span>
+<span class="hll">                <span class="nb">system</span><span class="o">-</span><span class="n">id</span> <span class="mo">00</span><span class="p">:</span><span class="mo">00</span><span class="p">:</span><span class="mo">00</span><span class="p">:</span><span class="mi">11</span><span class="p">:</span><span class="mi">11</span><span class="p">:</span><span class="mi">11</span><span class="p">;</span>
+</span><span class="hll">                <span class="n">admin</span><span class="o">-</span><span class="n">key</span> <span class="mi">1</span><span class="p">;</span>
+</span>            <span class="p">}</span>
+<span class="hll">            <span class="n">mc</span><span class="o">-</span><span class="n">ae</span> <span class="p">{</span>
+</span><span class="hll">                <span class="n">mc</span><span class="o">-</span><span class="n">ae</span><span class="o">-</span><span class="n">id</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class="hll">                <span class="n">redundancy</span><span class="o">-</span><span class="n">group</span> <span class="mi">100</span><span class="p">;</span>
+</span><span class="hll">                <span class="n">chassis</span><span class="o">-</span><span class="n">id</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class="hll">                <span class="n">mode</span> <span class="n">active</span><span class="o">-</span><span class="n">active</span><span class="p">;</span>
+</span><span class="hll">                <span class="n">status</span><span class="o">-</span><span class="n">control</span> <span class="n">active</span><span class="p">;</span>
+</span><span class="hll">                <span class="n">init</span><span class="o">-</span><span class="n">delay</span><span class="o">-</span><span class="nb">time</span> <span class="mi">15</span><span class="p">;</span>
+</span><span class="hll">            <span class="p">}</span>
+</span>        <span class="p">}</span>
+        <span class="n">unit</span> <span class="mi">0</span> <span class="p">{</span>
+            <span class="n">family</span> <span class="n">ethernet</span><span class="o">-</span><span class="n">switching</span> <span class="p">{</span>
+                <span class="n">interface</span><span class="o">-</span><span class="n">mode</span> <span class="n">access</span><span class="p">;</span>
+                <span class="n">vlan</span> <span class="p">{</span>
+                    <span class="n">members</span> <span class="n">v1000</span><span class="p">;</span>
+                <span class="p">}</span>
+            <span class="p">}</span>                           
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">irb</span> <span class="p">{</span>
+        <span class="n">unit</span> <span class="mi">1000</span> <span class="p">{</span>
+            <span class="n">family</span> <span class="n">inet</span> <span class="p">{</span>
+                <span class="n">address</span> <span class="mf">192.168.100.0</span><span class="o">/</span><span class="mi">31</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">protocols</span> <span class="p">{</span>
+    <span class="n">rstp</span> <span class="p">{</span>
+        <span class="n">interface</span> <span class="n">ae1</span> <span class="p">{</span>
+            <span class="n">edge</span><span class="p">;</span>                       
+        <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">vlans</span> <span class="p">{</span>
+    <span class="n">v1000</span> <span class="p">{</span>                             
+        <span class="n">vlan</span><span class="o">-</span><span class="n">id</span> <span class="mi">1000</span><span class="p">;</span>
+        <span class="n">l3</span><span class="o">-</span><span class="n">interface</span> <span class="n">irb</span><span class="mf">.1000</span><span class="p">;</span>
+<span class="hll">        <span class="n">mcae</span><span class="o">-</span><span class="n">mac</span><span class="o">-</span><span class="n">synchronize</span><span class="p">;</span>
+</span>    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-perl notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="c1"># qfx2</span>
+</span><span class="n">interfaces</span> <span class="p">{</span>
+    <span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">4</span> <span class="p">{</span>
+        <span class="n">ether</span><span class="o">-</span><span class="n">options</span> <span class="p">{</span>
+            <span class="mf">802.3</span><span class="n">ad</span> <span class="n">ae1</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">ae1</span> <span class="p">{</span>                               
+        <span class="n">aggregated</span><span class="o">-</span><span class="n">ether</span><span class="o">-</span><span class="n">options</span> <span class="p">{</span>
+            <span class="n">lacp</span> <span class="p">{</span>
+                <span class="n">active</span><span class="p">;</span>
+                <span class="n">periodic</span> <span class="n">slow</span><span class="p">;</span>
+<span class="hll">                <span class="nb">system</span><span class="o">-</span><span class="n">id</span> <span class="mo">00</span><span class="p">:</span><span class="mo">00</span><span class="p">:</span><span class="mo">00</span><span class="p">:</span><span class="mi">11</span><span class="p">:</span><span class="mi">11</span><span class="p">:</span><span class="mi">11</span><span class="p">;</span>
+</span><span class="hll">                <span class="n">admin</span><span class="o">-</span><span class="n">key</span> <span class="mi">1</span><span class="p">;</span>
+</span>            <span class="p">}</span>
+<span class="hll">            <span class="n">mc</span><span class="o">-</span><span class="n">ae</span> <span class="p">{</span>
+</span><span class="hll">                <span class="n">mc</span><span class="o">-</span><span class="n">ae</span><span class="o">-</span><span class="n">id</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class="hll">                <span class="n">redundancy</span><span class="o">-</span><span class="n">group</span> <span class="mi">100</span><span class="p">;</span>
+</span><span class="hll">                <span class="n">chassis</span><span class="o">-</span><span class="n">id</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class="hll">                <span class="n">mode</span> <span class="n">active</span><span class="o">-</span><span class="n">active</span><span class="p">;</span>
+</span><span class="hll">                <span class="n">status</span><span class="o">-</span><span class="n">control</span> <span class="n">standby</span><span class="p">;</span>
+</span><span class="hll">                <span class="n">init</span><span class="o">-</span><span class="n">delay</span><span class="o">-</span><span class="nb">time</span> <span class="mi">15</span><span class="p">;</span>
+</span><span class="hll">            <span class="p">}</span>
+</span>        <span class="p">}</span>
+        <span class="n">unit</span> <span class="mi">0</span> <span class="p">{</span>
+            <span class="n">family</span> <span class="n">ethernet</span><span class="o">-</span><span class="n">switching</span> <span class="p">{</span>
+                <span class="n">interface</span><span class="o">-</span><span class="n">mode</span> <span class="n">access</span><span class="p">;</span>
+                <span class="n">vlan</span> <span class="p">{</span>
+                    <span class="n">members</span> <span class="n">v1000</span><span class="p">;</span>
+                <span class="p">}</span>
+            <span class="p">}</span>                           
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">irb</span> <span class="p">{</span>
+        <span class="n">unit</span> <span class="mi">1000</span> <span class="p">{</span>
+            <span class="n">family</span> <span class="n">inet</span> <span class="p">{</span>
+                <span class="n">address</span> <span class="mf">192.168.100.0</span><span class="o">/</span><span class="mi">31</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">protocols</span> <span class="p">{</span>
+    <span class="n">rstp</span> <span class="p">{</span>
+        <span class="n">interface</span> <span class="n">ae1</span> <span class="p">{</span>
+            <span class="n">edge</span><span class="p">;</span>
+        <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">vlans</span> <span class="p">{</span>
+    <span class="n">v1000</span> <span class="p">{</span>
+        <span class="n">vlan</span><span class="o">-</span><span class="n">id</span> <span class="mi">1000</span><span class="p">;</span>
+        <span class="n">l3</span><span class="o">-</span><span class="n">interface</span> <span class="n">irb</span><span class="mf">.1000</span><span class="p">;</span>
+<span class="hll">        <span class="n">mcae</span><span class="o">-</span><span class="n">mac</span><span class="o">-</span><span class="n">synchronize</span><span class="p">;</span>
+</span>    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The lines highlighted are specific to MC-LAG; everything else is just
+normal LACP configuration.  Note that on both vQFX-1 and vQFX-2 the
+<a class="reference internal" href="#lacp-system-id"><span class="std std-ref">LACP System ID</span></a>, <a class="reference internal" href="#lacp-admin-key"><span class="std std-ref">LACP Admin Key</span></a>, <a class="reference internal" href="#mcae-id"><span class="std std-ref">MCAE ID</span></a>,
+<a class="reference internal" href="#mcae-redundancy-group"><span class="std std-ref">Redundancy Group ID</span></a>, and <a class="reference internal" href="#mcae-mode"><span class="std std-ref">MCAE Mode</span></a> are all the same.</p>
+<p>However, the <a class="reference internal" href="#mcae-chassis-id"><span class="std std-ref">MCAE Chassis ID</span></a> and <a class="reference internal" href="#status-control"><span class="std std-ref">Status Control</span></a> are unique
+between the two devices.</p>
+<p>Next we’ll configure vQFX-3, which is just standard LACP configuration:</p>
+<div class="highlight-perl notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="c1"># vQFX-3</span>
+</span><span class="n">interfaces</span> <span class="p">{</span>
+    <span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">2</span> <span class="p">{</span>
+        <span class="n">ether</span><span class="o">-</span><span class="n">options</span> <span class="p">{</span>
+            <span class="mf">802.3</span><span class="n">ad</span> <span class="n">ae0</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">4</span> <span class="p">{</span>
+        <span class="n">ether</span><span class="o">-</span><span class="n">options</span> <span class="p">{</span>                 
+            <span class="mf">802.3</span><span class="n">ad</span> <span class="n">ae0</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">ae0</span> <span class="p">{</span>
+        <span class="n">aggregated</span><span class="o">-</span><span class="n">ether</span><span class="o">-</span><span class="n">options</span> <span class="p">{</span>
+            <span class="n">lacp</span> <span class="p">{</span>
+                <span class="n">active</span><span class="p">;</span>
+                <span class="n">periodic</span> <span class="n">slow</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="n">unit</span> <span class="mi">0</span> <span class="p">{</span>
+            <span class="n">family</span> <span class="n">inet</span> <span class="p">{</span>               
+                <span class="n">address</span> <span class="mf">192.168.100.1</span><span class="o">/</span><span class="mi">31</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">routing</span><span class="o">-</span><span class="n">options</span> <span class="p">{</span>
+    <span class="n">static</span> <span class="p">{</span>
+        <span class="n">route</span> <span class="mf">0.0.0.0</span><span class="o">/</span><span class="mi">0</span> <span class="k">next</span><span class="o">-</span><span class="n">hop</span> <span class="mf">192.168.100.0</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">router</span><span class="o">-</span><span class="n">id</span> <span class="mf">3.3.3.3</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>We add a static default route so that we can ping vQFX-4 later once its
+configuration is complete.  But first, let’s make sure we can ping our
+gateway!</p>
+<div class="highlight-perl notranslate"><div class="highlight"><pre><span></span><span class="n">root</span><span class="nv">@vQFX</span><span class="o">-</span><span class="mi">3</span><span class="o">&gt;</span> <span class="n">ping</span> <span class="mf">192.168.100.0</span> <span class="n">rapid</span> <span class="n">count</span> <span class="mi">5</span> 
+<span class="n">PING</span> <span class="mf">192.168.100.0</span> <span class="p">(</span><span class="mf">192.168.100.0</span><span class="p">):</span> <span class="mi">56</span> <span class="n">data</span> <span class="n">bytes</span>
+<span class="o">!!!!!</span>
+<span class="o">---</span> <span class="mf">192.168.100.0</span> <span class="n">ping</span> <span class="n">statistics</span> <span class="o">---</span>
+<span class="hll"><span class="mi">5</span> <span class="n">packets</span> <span class="n">transmitted</span><span class="p">,</span> <span class="mi">5</span> <span class="n">packets</span> <span class="n">received</span><span class="p">,</span> <span class="mi">0</span><span class="nv">%</span> <span class="nv">packet</span> <span class="n">loss</span>
+</span><span class="n">round</span><span class="o">-</span><span class="n">trip</span> <span class="n">min</span><span class="sr">/avg/m</span><span class="n">ax</span><span class="sr">/stddev = 306.100/</span><span class="mf">365.522</span><span class="sr">/380.486/</span><span class="mf">29.711</span> <span class="n">ms</span>
+
+<span class="p">{</span><span class="n">master:0</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Success!  Let’s move on to configuring the MCAE toward vQFX-4, which is
+slightly more complicated due to running OSPF.  We’ll split up the layer
+2 configuation and the layer 3 configuration to make it a little easier
+to digest.</p>
+<p>First, let’s configure the upstream devices:</p>
+<div class="highlight-perl notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="c1"># qfx1</span>
+</span><span class="n">interfaces</span> <span class="p">{</span>
+    <span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">3</span> <span class="p">{</span>
+        <span class="n">ether</span><span class="o">-</span><span class="n">options</span> <span class="p">{</span>
+            <span class="mf">802.3</span><span class="n">ad</span> <span class="n">ae2</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">ae2</span> <span class="p">{</span>
+        <span class="n">aggregated</span><span class="o">-</span><span class="n">ether</span><span class="o">-</span><span class="n">options</span> <span class="p">{</span>
+            <span class="n">lacp</span> <span class="p">{</span>
+                <span class="n">active</span><span class="p">;</span>
+                <span class="n">periodic</span> <span class="n">slow</span><span class="p">;</span>
+<span class="hll">                <span class="nb">system</span><span class="o">-</span><span class="n">id</span> <span class="mo">00</span><span class="p">:</span><span class="mo">00</span><span class="p">:</span><span class="mo">00</span><span class="p">:</span><span class="mi">22</span><span class="p">:</span><span class="mi">22</span><span class="p">:</span><span class="mi">22</span><span class="p">;</span>
+</span><span class="hll">                <span class="n">admin</span><span class="o">-</span><span class="n">key</span> <span class="mi">2</span><span class="p">;</span>
+</span>            <span class="p">}</span>
+<span class="hll">            <span class="n">mc</span><span class="o">-</span><span class="n">ae</span> <span class="p">{</span>
+</span><span class="hll">                <span class="n">mc</span><span class="o">-</span><span class="n">ae</span><span class="o">-</span><span class="n">id</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class="hll">                <span class="n">redundancy</span><span class="o">-</span><span class="n">group</span> <span class="mi">100</span><span class="p">;</span>
+</span><span class="hll">                <span class="n">chassis</span><span class="o">-</span><span class="n">id</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class="hll">                <span class="n">mode</span> <span class="n">active</span><span class="o">-</span><span class="n">active</span><span class="p">;</span>
+</span><span class="hll">                <span class="n">status</span><span class="o">-</span><span class="n">control</span> <span class="n">standby</span><span class="p">;</span>
+</span><span class="hll">                <span class="n">init</span><span class="o">-</span><span class="n">delay</span><span class="o">-</span><span class="nb">time</span> <span class="mi">15</span><span class="p">;</span>
+</span><span class="hll">            <span class="p">}</span>
+</span>        <span class="p">}</span>
+        <span class="n">unit</span> <span class="mi">0</span> <span class="p">{</span>
+            <span class="n">family</span> <span class="n">ethernet</span><span class="o">-</span><span class="n">switching</span> <span class="p">{</span>
+                <span class="n">interface</span><span class="o">-</span><span class="n">mode</span> <span class="n">access</span><span class="p">;</span>
+                <span class="n">vlan</span> <span class="p">{</span>                  
+                    <span class="n">members</span> <span class="n">v2000</span><span class="p">;</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">protocols</span> <span class="p">{</span>
+    <span class="n">rstp</span> <span class="p">{</span>
+        <span class="n">interface</span> <span class="n">ae2</span> <span class="p">{</span>
+            <span class="n">edge</span><span class="p">;</span>
+        <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">vlans</span> <span class="p">{</span>
+    <span class="n">v2000</span> <span class="p">{</span>
+        <span class="n">vlan</span><span class="o">-</span><span class="n">id</span> <span class="mi">2000</span><span class="p">;</span>
+        <span class="n">l3</span><span class="o">-</span><span class="n">interface</span> <span class="n">irb</span><span class="mf">.2000</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-perl notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="c1"># qfx2</span>
+</span><span class="n">interfaces</span> <span class="p">{</span>
+    <span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">5</span> <span class="p">{</span>
+        <span class="n">ether</span><span class="o">-</span><span class="n">options</span> <span class="p">{</span>
+            <span class="mf">802.3</span><span class="n">ad</span> <span class="n">ae2</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">ae2</span> <span class="p">{</span>
+        <span class="n">aggregated</span><span class="o">-</span><span class="n">ether</span><span class="o">-</span><span class="n">options</span> <span class="p">{</span>
+            <span class="n">lacp</span> <span class="p">{</span>
+                <span class="n">active</span><span class="p">;</span>
+                <span class="n">periodic</span> <span class="n">slow</span><span class="p">;</span>
+<span class="hll">                <span class="nb">system</span><span class="o">-</span><span class="n">id</span> <span class="mo">00</span><span class="p">:</span><span class="mo">00</span><span class="p">:</span><span class="mo">00</span><span class="p">:</span><span class="mi">22</span><span class="p">:</span><span class="mi">22</span><span class="p">:</span><span class="mi">22</span><span class="p">;</span>
+</span><span class="hll">                <span class="n">admin</span><span class="o">-</span><span class="n">key</span> <span class="mi">2</span><span class="p">;</span>
+</span>            <span class="p">}</span>
+<span class="hll">            <span class="n">mc</span><span class="o">-</span><span class="n">ae</span> <span class="p">{</span>
+</span><span class="hll">                <span class="n">mc</span><span class="o">-</span><span class="n">ae</span><span class="o">-</span><span class="n">id</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class="hll">                <span class="n">redundancy</span><span class="o">-</span><span class="n">group</span> <span class="mi">100</span><span class="p">;</span>
+</span><span class="hll">                <span class="n">chassis</span><span class="o">-</span><span class="n">id</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class="hll">                <span class="n">mode</span> <span class="n">active</span><span class="o">-</span><span class="n">active</span><span class="p">;</span>
+</span><span class="hll">                <span class="n">status</span><span class="o">-</span><span class="n">control</span> <span class="n">active</span><span class="p">;</span>
+</span><span class="hll">                <span class="n">init</span><span class="o">-</span><span class="n">delay</span><span class="o">-</span><span class="nb">time</span> <span class="mi">15</span><span class="p">;</span>
+</span><span class="hll">            <span class="p">}</span>
+</span>        <span class="p">}</span>
+        <span class="n">unit</span> <span class="mi">0</span> <span class="p">{</span>
+            <span class="n">family</span> <span class="n">ethernet</span><span class="o">-</span><span class="n">switching</span> <span class="p">{</span>
+                <span class="n">interface</span><span class="o">-</span><span class="n">mode</span> <span class="n">access</span><span class="p">;</span>
+                <span class="n">vlan</span> <span class="p">{</span>                  
+                    <span class="n">members</span> <span class="n">v2000</span><span class="p">;</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">protocols</span> <span class="p">{</span>
+    <span class="n">rstp</span> <span class="p">{</span>
+        <span class="n">interface</span> <span class="n">ae2</span> <span class="p">{</span>
+            <span class="n">edge</span><span class="p">;</span>
+        <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">vlans</span> <span class="p">{</span>
+    <span class="n">v2000</span> <span class="p">{</span>
+        <span class="n">vlan</span><span class="o">-</span><span class="n">id</span> <span class="mi">2000</span><span class="p">;</span>
+        <span class="n">l3</span><span class="o">-</span><span class="n">interface</span> <span class="n">irb</span><span class="mf">.2000</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The MC-LAG-specific configurations are highlighted above.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Notice in this example that we did not configure
+<code class="docutils literal notranslate"><span class="pre">mcae-mac-synchronization</span></code> on the VLAN.  This is because we will be
+using VRRP due to the OSPF requirement, and these two configurations
+are mutually exclusive on the QFX series switches.</p>
+</div>
+<p>Now let’s examine the layer 3 configuration on vQFX-1 and vQFX-2:</p>
+<div class="highlight-perl notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="c1"># qfx1</span>
+</span><span class="n">interfaces</span> <span class="p">{</span>
+    <span class="n">irb</span> <span class="p">{</span>
+        <span class="n">unit</span> <span class="mi">2000</span> <span class="p">{</span>
+            <span class="n">family</span> <span class="n">inet</span> <span class="p">{</span>
+                <span class="n">address</span> <span class="mf">192.168.200.2</span><span class="o">/</span><span class="mi">29</span> <span class="p">{</span>
+<span class="hll">                    <span class="n">arp</span> <span class="mf">192.168.200.3</span> <span class="n">l2</span><span class="o">-</span><span class="n">interface</span> <span class="n">ae0</span><span class="mf">.0</span> <span class="n">mac</span> <span class="mo">02</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mi">86</span><span class="p">:</span><span class="mi">71</span><span class="p">:</span><span class="mi">93</span><span class="p">:</span><span class="mo">00</span><span class="p">;</span>
+</span>                    <span class="n">vrrp</span><span class="o">-</span><span class="n">group</span> <span class="mi">1</span> <span class="p">{</span>
+                        <span class="n">virtual</span><span class="o">-</span><span class="n">address</span> <span class="mf">192.168.200.1</span><span class="p">;</span>
+                        <span class="n">priority</span> <span class="mi">200</span><span class="p">;</span>
+                        <span class="nb">accept</span><span class="o">-</span><span class="n">data</span><span class="p">;</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">routing</span><span class="o">-</span><span class="n">options</span> <span class="p">{</span>
+    <span class="n">router</span><span class="o">-</span><span class="n">id</span> <span class="mf">1.1.1.1</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="n">protocols</span> <span class="p">{</span>
+    <span class="n">ospf</span> <span class="p">{</span>
+        <span class="n">area</span> <span class="mf">0.0.0.0</span> <span class="p">{</span>
+            <span class="n">interface</span> <span class="n">irb</span><span class="mf">.2000</span><span class="p">;</span>
+            <span class="n">interface</span> <span class="n">irb</span><span class="mf">.1000</span> <span class="p">{</span>
+                <span class="n">passive</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-perl notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="c1"># qfx2</span>
+</span><span class="n">interfaces</span> <span class="p">{</span>
+    <span class="n">irb</span> <span class="p">{</span>
+        <span class="n">unit</span> <span class="mi">2000</span> <span class="p">{</span>
+            <span class="n">family</span> <span class="n">inet</span> <span class="p">{</span>
+                <span class="n">address</span> <span class="mf">192.168.200.3</span><span class="o">/</span><span class="mi">29</span> <span class="p">{</span>
+<span class="hll">                    <span class="n">arp</span> <span class="mf">192.168.200.2</span> <span class="n">l2</span><span class="o">-</span><span class="n">interface</span> <span class="n">ae0</span><span class="mf">.0</span> <span class="n">mac</span> <span class="mo">02</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mi">86</span><span class="p">:</span><span class="mi">71</span><span class="p">:</span><span class="mi">62</span><span class="p">:</span><span class="mo">00</span><span class="p">;</span>
+</span>                    <span class="n">vrrp</span><span class="o">-</span><span class="n">group</span> <span class="mi">1</span> <span class="p">{</span>
+                        <span class="n">virtual</span><span class="o">-</span><span class="n">address</span> <span class="mf">192.168.200.1</span><span class="p">;</span>
+                        <span class="n">priority</span> <span class="mi">100</span><span class="p">;</span>
+                        <span class="nb">accept</span><span class="o">-</span><span class="n">data</span><span class="p">;</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">routing</span><span class="o">-</span><span class="n">options</span> <span class="p">{</span>
+    <span class="n">router</span><span class="o">-</span><span class="n">id</span> <span class="mf">2.2.2.2</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="n">protocols</span> <span class="p">{</span>
+    <span class="n">ospf</span> <span class="p">{</span>
+        <span class="n">area</span> <span class="mf">0.0.0.0</span> <span class="p">{</span>
+            <span class="n">interface</span> <span class="n">irb</span><span class="mf">.2000</span><span class="p">;</span>
+            <span class="n">interface</span> <span class="n">irb</span><span class="mf">.1000</span> <span class="p">{</span>
+                <span class="n">passive</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The only line that is different compared to standard layer 3
+configuration is the static ARP entry.  Recall from
+<a class="reference internal" href="#layer-3-connectivity"><span class="std std-ref">Layer 3 Connectivity</span></a> that we need a static ARP entry pointing to
+the remote device’s IRB MAC address via the ICL.  That’s all this
+configuration line does: create a static ARP entry for the real IP of
+the remote switch with its IRB MAC via the ICL.</p>
+<p>We can now examine vQFX-4’s configuration:</p>
+<div class="highlight-perl notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="c1"># vQFX-4</span>
+</span><span class="n">interfaces</span> <span class="p">{</span>
+    <span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">3</span> <span class="p">{</span>
+        <span class="n">ether</span><span class="o">-</span><span class="n">options</span> <span class="p">{</span>
+            <span class="mf">802.3</span><span class="n">ad</span> <span class="n">ae0</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mi">5</span> <span class="p">{</span>
+        <span class="n">ether</span><span class="o">-</span><span class="n">options</span> <span class="p">{</span>                 
+            <span class="mf">802.3</span><span class="n">ad</span> <span class="n">ae0</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">ae0</span> <span class="p">{</span>
+        <span class="n">aggregated</span><span class="o">-</span><span class="n">ether</span><span class="o">-</span><span class="n">options</span> <span class="p">{</span>
+            <span class="n">lacp</span> <span class="p">{</span>
+                <span class="n">active</span><span class="p">;</span>
+                <span class="n">periodic</span> <span class="n">slow</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="n">unit</span> <span class="mi">0</span> <span class="p">{</span>
+            <span class="n">family</span> <span class="n">inet</span> <span class="p">{</span>
+                <span class="n">address</span> <span class="mf">192.168.200.4</span><span class="o">/</span><span class="mi">29</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">routing</span><span class="o">-</span><span class="n">options</span> <span class="p">{</span>
+    <span class="n">router</span><span class="o">-</span><span class="n">id</span> <span class="mf">4.4.4.4</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="n">protocols</span> <span class="p">{</span>
+    <span class="n">ospf</span> <span class="p">{</span>
+        <span class="n">area</span> <span class="mf">0.0.0.0</span> <span class="p">{</span>
+            <span class="n">interface</span> <span class="n">ae0</span><span class="mf">.0</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This is just standard configuration.  No special tricks required!  Let’s
+check OSPF:</p>
+<div class="highlight-perl notranslate"><div class="highlight"><pre><span></span><span class="n">root</span><span class="nv">@vQFX</span><span class="o">-</span><span class="mi">1</span><span class="o">&gt;</span> <span class="n">show</span> <span class="n">ospf</span> <span class="n">neighbor</span> 
+<span class="n">Address</span>          <span class="n">Interface</span>              <span class="n">State</span>     <span class="n">ID</span>               <span class="n">Pri</span>  <span class="n">Dead</span>
+<span class="hll"><span class="mf">192.168.200.4</span>    <span class="n">irb</span><span class="mf">.2000</span>               <span class="n">Full</span>      <span class="mf">4.4.4.4</span>          <span class="mi">128</span>    <span class="mi">30</span>
+</span><span class="hll"><span class="mf">192.168.200.3</span>    <span class="n">irb</span><span class="mf">.2000</span>               <span class="n">Full</span>      <span class="mf">2.2.2.2</span>          <span class="mi">128</span>    <span class="mi">36</span>
+</span>
+<span class="p">{</span><span class="n">master:0</span><span class="p">}</span>
+
+<span class="n">root</span><span class="nv">@vQFX</span><span class="o">-</span><span class="mi">2</span><span class="o">&gt;</span> <span class="n">show</span> <span class="n">ospf</span> <span class="n">neighbor</span>    
+<span class="n">Address</span>          <span class="n">Interface</span>              <span class="n">State</span>     <span class="n">ID</span>               <span class="n">Pri</span>  <span class="n">Dead</span>
+<span class="hll"><span class="mf">192.168.200.4</span>    <span class="n">irb</span><span class="mf">.2000</span>               <span class="n">Full</span>      <span class="mf">4.4.4.4</span>          <span class="mi">128</span>    <span class="mi">32</span>
+</span><span class="hll"><span class="mf">192.168.200.2</span>    <span class="n">irb</span><span class="mf">.2000</span>               <span class="n">Full</span>      <span class="mf">1.1.1.1</span>          <span class="mi">128</span>    <span class="mi">34</span>
+</span>
+<span class="p">{</span><span class="n">master:0</span><span class="p">}</span>
+
+<span class="n">root</span><span class="nv">@vQFX</span><span class="o">-</span><span class="mi">4</span><span class="o">&gt;</span> <span class="n">show</span> <span class="n">ospf</span> <span class="n">neighbor</span>    
+<span class="n">Address</span>          <span class="n">Interface</span>              <span class="n">State</span>     <span class="n">ID</span>               <span class="n">Pri</span>  <span class="n">Dead</span>
+<span class="hll"><span class="mf">192.168.200.2</span>    <span class="n">ae0</span><span class="mf">.0</span>                  <span class="n">Full</span>      <span class="mf">1.1.1.1</span>          <span class="mi">128</span>    <span class="mi">33</span>
+</span><span class="hll"><span class="mf">192.168.200.3</span>    <span class="n">ae0</span><span class="mf">.0</span>                  <span class="n">Full</span>      <span class="mf">2.2.2.2</span>          <span class="mi">128</span>    <span class="mi">39</span>
+</span>
+<span class="p">{</span><span class="n">master:0</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Finally, let’s ensure we can ping between vQFX-3 and vQFX-4:</p>
+<div class="highlight-perl notranslate"><div class="highlight"><pre><span></span><span class="n">root</span><span class="nv">@vQFX</span><span class="o">-</span><span class="mi">3</span><span class="o">&gt;</span> <span class="n">ping</span> <span class="mf">192.168.200.4</span> <span class="n">rapid</span> <span class="n">count</span> <span class="mi">5</span>    
+<span class="n">PING</span> <span class="mf">192.168.200.4</span> <span class="p">(</span><span class="mf">192.168.200.4</span><span class="p">):</span> <span class="mi">56</span> <span class="n">data</span> <span class="n">bytes</span>
+<span class="o">!!!!!</span>
+<span class="o">---</span> <span class="mf">192.168.200.4</span> <span class="n">ping</span> <span class="n">statistics</span> <span class="o">---</span>
+<span class="hll"><span class="mi">5</span> <span class="n">packets</span> <span class="n">transmitted</span><span class="p">,</span> <span class="mi">5</span> <span class="n">packets</span> <span class="n">received</span><span class="p">,</span> <span class="mi">0</span><span class="nv">%</span> <span class="nv">packet</span> <span class="n">loss</span>
+</span><span class="n">round</span><span class="o">-</span><span class="n">trip</span> <span class="n">min</span><span class="sr">/avg/m</span><span class="n">ax</span><span class="sr">/stddev = 239.258/</span><span class="mf">425.293</span><span class="sr">/601.453/</span><span class="mf">129.111</span> <span class="n">ms</span>
+
+<span class="p">{</span><span class="n">master:0</span><span class="p">}</span>
+
+<span class="n">root</span><span class="nv">@vQFX</span><span class="o">-</span><span class="mi">4</span><span class="o">&gt;</span> <span class="n">ping</span> <span class="mf">192.168.100.1</span> <span class="n">rapid</span> <span class="n">count</span> <span class="mi">5</span> 
+<span class="n">PING</span> <span class="mf">192.168.100.1</span> <span class="p">(</span><span class="mf">192.168.100.1</span><span class="p">):</span> <span class="mi">56</span> <span class="n">data</span> <span class="n">bytes</span>
+<span class="o">!!!!!</span>
+<span class="o">---</span> <span class="mf">192.168.100.1</span> <span class="n">ping</span> <span class="n">statistics</span> <span class="o">---</span>
+<span class="hll"><span class="mi">5</span> <span class="n">packets</span> <span class="n">transmitted</span><span class="p">,</span> <span class="mi">5</span> <span class="n">packets</span> <span class="n">received</span><span class="p">,</span> <span class="mi">0</span><span class="nv">%</span> <span class="nv">packet</span> <span class="n">loss</span>
+</span><span class="n">round</span><span class="o">-</span><span class="n">trip</span> <span class="n">min</span><span class="sr">/avg/m</span><span class="n">ax</span><span class="sr">/stddev = 114.584/</span><span class="mf">234.628</span><span class="sr">/287.023/</span><span class="mf">67.643</span> <span class="n">ms</span>
+
+<span class="p">{</span><span class="n">master:0</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>And that’s it!  MC-LAG configuration for simple gateway and advanced
+layer 3 routing is working.</p>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
+<p>We’ve brushed the surface of MC-LAG, hopefully enough for the JNCIP-DC.
+For more detailed information, check out Juniper MX Series, Second
+Edition <a class="footnote-reference brackets" href="#f4" id="id16">4</a>.</p>
+<p class="rubric">Footnotes</p>
+<dl class="footnote brackets">
+<dt class="label" id="f1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p><a class="reference external" href="https://www.juniper.net/us/en/training/jnbooks/day-one/ambassadors-cookbook-2019/index.page">Juniper Ambassador’s Cookbook 2019, Recipe #5</a></p>
+</dd>
+<dt class="label" id="f2"><span class="brackets">2</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id3">2</a>,<a href="#id5">3</a>)</span></dt>
+<dd><p><a class="reference external" href="https://www.amazon.ca/Juniper-MX-Comprehensive-Guide-Technologies/dp/1491932724/">Juniper MX Series, Chapter 9, ICCP Hierarchy Section</a></p>
+</dd>
+<dt class="label" id="f3"><span class="brackets">3</span><span class="fn-backref">(<a href="#id12">1</a>,<a href="#id15">2</a>)</span></dt>
+<dd><p><a class="reference external" href="https://www.juniper.net/documentation/en_US/junos/topics/concept/mc-lag-feature-summary-best-practices.html">Understanding Multichassis Link Aggregation Groups</a></p>
+</dd>
+<dt class="label" id="f4"><span class="brackets">4</span><span class="fn-backref">(<a href="#id4">1</a>,<a href="#id16">2</a>)</span></dt>
+<dd><p><a class="reference external" href="https://www.amazon.com/Juniper-MX-Comprehensive-Guide-Technologies/dp/1491932724/">Juniper MX Series, Second Edition</a></p>
+</dd>
+</dl>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">jncip-dc-notes</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Multi-Chassis LAG (MC-LAG)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#terminology">Terminology</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#service-id">Service ID</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#redundancy-group-id">Redundancy Group ID</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mcae-id">MCAE ID</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mcae-chassis-id">MCAE Chassis ID</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#lacp-system-id">LACP System ID</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#lacp-admin-key">LACP Admin Key</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mcae-mode">MCAE Mode</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#status-control">Status Control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mc-lag-protection">MC-LAG Protection</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#guidelines">Guidelines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#inter-chassis-link-redundancy">Inter-Chassis Link Redundancy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compensating-for-lack-of-lacp-support">Compensating for Lack of LACP support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#layer-3-connectivity">Layer 3 Connectivity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spanning-tree-protocol">Spanning Tree Protocol</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#conclusion">Conclusion</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="dc-deployment-and-management.html" title="previous chapter">&lt;no title&gt;</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Tyler Christiansen.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/mc-lag.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
