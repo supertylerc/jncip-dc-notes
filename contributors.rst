@@ -13,4 +13,4 @@ format is used:
 All of this is optional.  Anything that is either not relevant or
 requested to be left out will not be present in the entry.
 
-* [Steve Rossen](https://github.com/srossen) ([@steve](https://twitter.com/steve): It's Saturday night and you are studying: [Issue #1](https://github.com/supertylerc/jncip-dc-notes/issues/1) Closed, Won't Fix.
+* `Steve Rossen <https://github.com/srossen>`_ (`@steve <https://twitter.com/steve>`_: It's Saturday night and you are studying: `Issue #1 <https://github.com/supertylerc/jncip-dc-notes/issues/1>`_ Closed, Won't Fix.
