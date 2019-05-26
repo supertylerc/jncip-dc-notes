@@ -496,6 +496,12 @@ We've brushed the surface of MC-LAG, hopefully enough for the JNCIP-DC.
 For more detailed information, check out Juniper MX Series, Second
 Edition [#f4]_.
 
+The following blogs were helpful in compiling these notes:
+
+* `MC-LAG on vQFX (EVE-NG) <https://jncie.eu/mc-lag-on-vqfx-eve-ng/>`_
+* `MC-LAG Lab – Basic L2 Connectivity <https://jncie.tech/2017/07/29/mc-lag-lab-basic-l2-connectivity/>`_
+* `MC-LAG Lab – Advanced IRB FunctinNality <https://jncie.tech/2017/07/30/mc-lag-lab-advanced-irb-functionality/>`_
+
 .. rubric:: Footnotes
 
 .. [#f1] `Juniper Ambassador's Cookbook 2019, Recipe #5 <https://www.juniper.net/us/en/training/jnbooks/day-one/ambassadors-cookbook-2019/index.page>`_

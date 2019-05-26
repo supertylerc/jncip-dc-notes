@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>&lt;no title&gt; &#8212; jncip-dc-notes  documentation</title>
+    <title>Data Center Deployment and Management &#8212; jncip-dc-notes  documentation</title>
     <link rel="stylesheet" href="static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="static/documentation_options.js"></script>
@@ -32,7 +32,220 @@
 
           <div class="body" role="main">
             
-  
+  <div class="section" id="data-center-deployment-and-management">
+<h1>Data Center Deployment and Management<a class="headerlink" href="#data-center-deployment-and-management" title="Permalink to this headline">¶</a></h1>
+<p>This blueprint item covers a number of topics:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#ztp"><span class="std std-ref">Zero-Touch Provisioning</span></a></p></li>
+<li><p><a class="reference internal" href="#ha"><span class="std std-ref">High Availability</span></a></p></li>
+<li><p><a class="reference internal" href="#monitoring"><span class="std std-ref">Monitoring</span></a></p></li>
+<li><p><a class="reference internal" href="#analytics"><span class="std std-ref">Analytics</span></a></p></li>
+</ul>
+<p>Unfortunately, the blueprint doesn’t indicate to what level those items
+should be known, and all of those options seem to require physical
+hardware, which I do not have.  So this guide will only be theory until
+someone contributes configuration sections.</p>
+<div class="section" id="zero-touch-provisioning">
+<span id="ztp"></span><h2>Zero-Touch Provisioning<a class="headerlink" href="#zero-touch-provisioning" title="Permalink to this headline">¶</a></h2>
+<p>ZTP is a process for upgrading software and applying configuration
+automatically on first boot.  This is accomplished by using a stadard
+DHCP server with a little bit of extra configuration so that each
+<code class="docutils literal notranslate"><span class="pre">DISCOVER</span></code> is associated with the correct switch so that the correct
+configuration can be retrieved.</p>
+<p>When configuring the DHCP server, the following DHCP options can be
+used:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">12</span></code>: Switch Hostname</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">42</span></code>: NTP Server</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">43.00</span></code>: Software image filename</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">43.01</span></code>: Configuration file filename</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">43.02</span></code>: Symbolic link flag for filename</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">43.03</span></code>: Transfer mode (HTTP, FTP, TFTP)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">43.04</span></code>: Alternate software image filename</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">66</span></code>: DNS FQDN for the HTTP/FTP/TFTP server</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">150</span></code>: IP Address for the HTTP/FTP/TFTP server</p></li>
+</ul>
+<p>The reason that both <code class="docutils literal notranslate"><span class="pre">44.00</span></code> and <code class="docutils literal notranslate"><span class="pre">44.04</span></code> can both be used is that
+some DHCP servers may not support <code class="docutils literal notranslate"><span class="pre">44.00</span></code>.  If both options are
+defined, <code class="docutils literal notranslate"><span class="pre">44.00</span></code> takes precedence.</p>
+<p>When setting the <code class="docutils literal notranslate"><span class="pre">44.00</span></code> or <code class="docutils literal notranslate"><span class="pre">44.04</span></code> location to a symlink, you also
+need to set the <code class="docutils literal notranslate"><span class="pre">44.02</span></code> option to the value <code class="docutils literal notranslate"><span class="pre">symlink</span></code> so that the
+system knows that the image is a symlink.</p>
+<p><code class="docutils literal notranslate"><span class="pre">44.03</span></code> lets you specify whether the file transfer method will be FTP,
+TFTP, or HTTP.  The default is TFTP.</p>
+<p>If DHCP options <code class="docutils literal notranslate"><span class="pre">66</span></code> and <code class="docutils literal notranslate"><span class="pre">150</span></code> are both specified, then <code class="docutils literal notranslate"><span class="pre">150</span></code>
+takes precedence.</p>
+<p>When the configuration file starts with a shebang (<code class="docutils literal notranslate"><span class="pre">#!</span></code>), Junos will
+attempt to run the file as a script.  This means you can use one Python
+or shell script to dynamically configure your switches instead of
+handcrafting a configuration file for each switch.</p>
+<p>By default, a QFX5100 will attempt to perform ZTP through both its
+management interface and its revenue ports.  This means you can perform
+ZTP through a dedicated OOB management network (recommended) or in-band.</p>
+<p>After the switch knows the details of its ZTP process, it first
+downloads the required configuration file and then the required software
+image (if necessary).  If a software image was downloaded, then the
+switch performs the software upgrade.  Finally, it applies the
+configuration file that was downloaded.</p>
+<p>ZTP can also be performed by Junos Space with Network Director.  When
+this is done, the switch is automatically added to Network Director for
+future management.</p>
+<p>For more information on ZTP (including configuration examples), see the
+following blogs/articles:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://blog.digitalocean.com/zero-touch-provisioning-how-to-build-a-network-without-touching-anything/">Zero Touch Provisioning: How to Build a Network Without Touching Anything</a></p></li>
+<li><p><a class="reference external" href="https://nextheader.net/2015/09/02/zero-touch-provisioning-on-juniper-devices-using-linux/">Zero Touch Provisioning on Juniper devices using Linux</a></p></li>
+</ul>
+<p>You can also read Chapter 6 of the QFX5100 Series book from O’Reilly <a class="footnote-reference brackets" href="#f1" id="id1">1</a>.</p>
+</div>
+<div class="section" id="high-availability">
+<span id="ha"></span><h2>High Availability<a class="headerlink" href="#high-availability" title="Permalink to this headline">¶</a></h2>
+<p>The QFX5100 has a virtualized control plane.  There is a Linux host
+running KVM, and Junos runs as a VM.  The hypervisor can run up to four
+VMs: two of them are reserved for Junos, one is a guest of the
+operator’s choice, and the last is reserved.</p>
+<p>Each Junos VM has four management interfaces.  The first two, <code class="docutils literal notranslate"><span class="pre">em0</span></code>
+and <code class="docutils literal notranslate"><span class="pre">em1</span></code>, map to the physical management ports on the switch.  The
+third, <code class="docutils literal notranslate"><span class="pre">em2</span></code>, is used for communicating with the hypervisor.  The last
+interface, <code class="docutils literal notranslate"><span class="pre">em3</span></code>, is used when performing a Topology-independent
+In-Service Software Upgrade, or TISSU.  The second Junos VM is only
+created during a TISSU.  In order to perform a TISSU, NSR, NSB, and GRES
+must be configured.</p>
+<p>The high-level process for TISSU is as follows <a class="footnote-reference brackets" href="#f2" id="id2">2</a>:</p>
+<p>1: Create the backup Junos VM running the new version requested
+2: Synchronize state between the Junos VMs using <code class="docutils literal notranslate"><span class="pre">ksyncd</span></code>
+3: Makes the new VM the master RE
+4: Renames the slot ID of the new VM from <code class="docutils literal notranslate"><span class="pre">1</span></code> to <code class="docutils literal notranslate"><span class="pre">0</span></code>
+5: The former master Junos VM is shut down</p>
+<p>When performing a TISSU, keep the following in mind:</p>
+<ul class="simple">
+<li><p>Downgrades and rollbacks are not supported</p></li>
+<li><p>TISSU should not be used when transitioning between different base
+images (e.g., <code class="docutils literal notranslate"><span class="pre">standard</span></code> to <code class="docutils literal notranslate"><span class="pre">enhanced-automation</span></code>)</p></li>
+<li><p>The CLI is inaccessible during a TISSU</p></li>
+<li><p>Log files are located in <code class="docutils literal notranslate"><span class="pre">/var/log/vjunos-log.tgz</span></code></p></li>
+<li><p>BFD timers need to be &gt;= 1 second <a class="footnote-reference brackets" href="#f3" id="id3">3</a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">system</span> <span class="pre">internet-options</span> <span class="pre">no-tcp-reset</span> <span class="pre">drop-all-tcp</span></code> must not be
+configured <a class="footnote-reference brackets" href="#f3" id="id4">3</a></p></li>
+</ul>
+<p>A configuration sample for enabling NSR, NSB, and GRES is below.</p>
+<div class="highlight-perl notranslate"><div class="highlight"><pre><span></span><span class="nb">system</span> <span class="p">{</span>
+    <span class="n">commit</span> <span class="n">synchronize</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="n">chassis</span> <span class="p">{</span>
+    <span class="n">redundancy</span> <span class="p">{</span>
+        <span class="n">graceful</span><span class="o">-</span><span class="n">switchover</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">routing</span><span class="o">-</span><span class="n">options</span> <span class="p">{</span>
+    <span class="n">nonstop</span><span class="o">-</span><span class="n">routing</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="n">protocols</span> <span class="p">{</span>
+    <span class="n">layer2</span><span class="o">-</span><span class="n">control</span> <span class="p">{</span>
+        <span class="n">nonstop</span><span class="o">-</span><span class="n">bridging</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Once the configuration is in place, you can perform a TISSU with the
+<code class="docutils literal notranslate"><span class="pre">request</span> <span class="pre">system</span> <span class="pre">software</span> <span class="pre">in-service-upgrade</span> <span class="pre">&lt;path-to-image&gt;</span></code> command.</p>
+<p>For more information, see Chapter 2 of the Juniper QFX5100 Series book
+<a class="footnote-reference brackets" href="#f1" id="id5">1</a>.</p>
+</div>
+<div class="section" id="monitoring">
+<span id="id6"></span><h2>Monitoring<a class="headerlink" href="#monitoring" title="Permalink to this headline">¶</a></h2>
+<p>Junos supports streaming telemetry as well as more traditional methods
+of monitoring such as SNMP.</p>
+<p>TODO: Add configuration for SNMPv2c, SNMPv3, and Streaming Telemetry.</p>
+</div>
+<div class="section" id="analytics">
+<span id="id7"></span><h2>Analytics<a class="headerlink" href="#analytics" title="Permalink to this headline">¶</a></h2>
+<p>The QFX5100 supports two methods of analytics: sFlow and Enhanced
+Analytics.  These are described below, but it’s important to understand
+that they should be used together as neither provides the entire picture
+on its own.</p>
+<div class="section" id="sflow">
+<h3>sFlow<a class="headerlink" href="#sflow" title="Permalink to this headline">¶</a></h3>
+<p>The QFX5100 supports sFlow, which samples every <code class="docutils literal notranslate"><span class="pre">n</span></code> packets.  This
+sampled data is exported every 1500 bytes or every 250ms.  Any alerting
+on this data must be performed off-box with the sFlow collector.  On the
+QFX5100, only switchports can be sampled.  Layer 3 interfaces cannot be
+sampled.  The first 128 bytes of the packet are sampled, and this
+includes information such as the source and destination MACs, IPs, and
+Ports.  Higher sampling rates require more processing power.</p>
+<p>To combat this on high-traffic switches, the QFX5100 can dynamically
+adjust sample rates based on interface traffic.  This is known as
+adaptive sampling.  An agent checks the interfaces every 5 seconds.
+A list of the top five interfaces is created.  An algorithm reduces the
+load by half for the top five interfaces and allocates those samples to
+lower traffic interfaces.</p>
+<p>An sFlow configuration is shown below.</p>
+<div class="highlight-perl notranslate"><div class="highlight"><pre><span></span><span class="n">protocols</span> <span class="p">{</span>
+    <span class="n">sflow</span> <span class="p">{</span>
+        <span class="n">polling</span><span class="o">-</span><span class="n">interval</span> <span class="mi">10</span><span class="p">;</span>
+        <span class="n">sample</span><span class="o">-</span><span class="n">rate</span> <span class="p">{</span>
+            <span class="n">ingress</span> <span class="mi">50</span><span class="p">;</span>
+            <span class="n">egress</span> <span class="mi">50</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">collector</span> <span class="mf">10.0.0.30</span> <span class="p">{</span>
+            <span class="n">udp</span><span class="o">-</span><span class="n">port</span> <span class="mi">9000</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">interfaces</span> <span class="n">xe</span><span class="o">-</span><span class="mi">0</span><span class="sr">/0/</span><span class="mf">0.0</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">polling-interval</span></code> tells Junos how frequently, in seconds, to
+poll for data; the <code class="docutils literal notranslate"><span class="pre">sampling-rate</span></code> tells Junos how many packets to
+sample.</p>
+</div>
+</div>
+<div class="section" id="juniper-enhanced-analytics">
+<h3>Juniper Enhanced Analytics<a class="headerlink" href="#juniper-enhanced-analytics" title="Permalink to this headline">¶</a></h3>
+<p>The QFX5100 also supports Juniper Enhanced Analytics.  This system can
+poll as frequently as every 8ms, and data is exported as soon as it is
+collected.  You can set thresholds on-box down to 1ns.  Enhanced
+Analytics can monitor:</p>
+<ul class="simple">
+<li><p>Traffic statistics</p></li>
+<li><p>Queue depth</p></li>
+<li><p>Latency</p></li>
+<li><p>Jitter</p></li>
+</ul>
+<p>This data can be streamed using the following formats:</p>
+<ul class="simple">
+<li><p>Protobuf</p></li>
+<li><p>JSON</p></li>
+<li><p>CSV</p></li>
+<li><p>TSV</p></li>
+</ul>
+<p>Enhanced Analytics is performed by two systems: the Analytics Daemon and
+the Analytics Manager.</p>
+<p>The Analytics Daemon (<code class="docutils literal notranslate"><span class="pre">analyticsd</span></code>) collects information from the
+Analytics Manager’s ring buffers and exports it to collectors.</p>
+<p>The Analytics Manager runs in the PFE and collects the data that is
+placed into ring buffers for <code class="docutils literal notranslate"><span class="pre">analyticsd</span></code> to collect.</p>
+<p>TODO: Add configuration examples for Enhanced Analytics.</p>
+<p>For more information, see Chapter 9 of the Juniper QFX5100 Series book
+<a class="footnote-reference brackets" href="#f1" id="id8">1</a>.</p>
+<p class="rubric">Footnotes</p>
+<dl class="footnote brackets">
+<dt class="label" id="f1"><span class="brackets">1</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id5">2</a>,<a href="#id8">3</a>)</span></dt>
+<dd><p><a class="reference external" href="https://www.amazon.com/Juniper-QFX5100-Comprehensive-Building-Next-Generation/dp/1491949570/">Juniper QFX5100 Series</a></p>
+</dd>
+<dt class="label" id="f2"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dd><p><a class="reference external" href="https://www.juniper.net/documentation/en_US/junos/topics/concept/issu-on-qfx5100-overview.html">Understanding In-Service Software Upgrade (ISSU)</a></p>
+</dd>
+<dt class="label" id="f3"><span class="brackets">3</span><span class="fn-backref">(<a href="#id3">1</a>,<a href="#id4">2</a>)</span></dt>
+<dd><p><a class="reference external" href="https://www.juniper.net/documentation/en_US/junos/topics/task/installation/issu-upgrading-qfx5100.html">Performing an In-Service Software Upgrade (ISSU) with Non-Stop Routing</a></p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+
 
           </div>
           
@@ -51,8 +264,22 @@
 
 <h3>Navigation</h3>
 <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Data Center Deployment and Management</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#zero-touch-provisioning">Zero-Touch Provisioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#high-availability">High Availability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#monitoring">Monitoring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#analytics">Analytics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#sflow">sFlow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#juniper-enhanced-analytics">Juniper Enhanced Analytics</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="mc-lag.html">Multi-Chassis LAG (MC-LAG)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="layer-2-fabrics.html">Layer 2 Fabrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="layer-3-fabrics.html">Layer 3 Fabrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributors.html">Contributors</a></li>
 </ul>
 
 <div class="relations">
