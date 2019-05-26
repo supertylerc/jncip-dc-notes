@@ -47,30 +47,24 @@ I'll take contributions however I can get them, but here are a few areas
 in which I'm particularly interested:
 
 * Diagrams: I'm really terrible at making diagrams.  I actually tried to
-            to make a few for this project, but I became far too
-            frustrated with the tools available to me (I don't have
-            Visio).  If you can contribute diagrams, it would be
-            incredibly helpful.
+  to make a few for this project, but I became far too frustrated with
+  the tools available to me (I don't have Visio).  If you can contribute
+  diagrams, it would be incredibly helpful.
 * Technical Corrections: These are my notes for an exam; I'm not an
-                         authority on the technologies, and I could
-                         definitely be wrong.  I don't have a technical
-                         reviewer.  If you find technical errors, please
-                         let me know either via e-mail, a GitHub issue,
-                         or a pull request to correct the issue.  All I
-                         ask is that for any technical correction, a
-                         source to the correct information be provided.
+  authority on the technologies, and I could definitely be wrong.  I
+  don't have a technical reviewer.  If you find technical errors, please
+  let me know either via e-mail, a GitHub issue, or a pull request to
+  correct the issue.  All I ask is that for any technical correction, a
+  source to the correct information be provided.
 * Grammatical Correction: This may seem odd, but if there's a grammar
-                          issue, I'd appreciate a correction.
+  issue, I'd appreciate a correction.
 * Labs and Configurations: More labs and configuration examples are
-                           always better!  I'm trying to provide
-                           examples, but it's sometimes difficult to
-                           capture.  In some cases, I can't provide any
-                           labs or configuration snippets because it
-                           requires physical gear (such as Virtual
-                           Chassis) and I only have access to vQFX10k.
-                           So if you can contribute labs or
-                           configuration snippets, they would be greatly
-                           appreciated!
+  always better!  I'm trying to provide examples, but it's sometimes
+  difficult to capture.  In some cases, I can't provide any labs or
+  configuration snippets because it requires physical gear (such as
+  Virtual Chassis) and I only have access to vQFX10k. So if you can
+  contribute labs or configuration snippets, they would be greatly
+  appreciated!
 
 If you have any other contribution to make, it's 100% welcome.  The best
 place to contribute and collaborate is the
@@ -80,7 +74,7 @@ ReStructured Text (the markup language in which these notes are
 written), you can submit pull requests to contribute.
 
 All contributions will be added to the :ref:`contributors` page unless
- the contributor requests otherwise.
+the contributor requests otherwise.
 
 .. toctree::
    :maxdepth: 5
