@@ -18,13 +18,20 @@ below.
 These notes have been taken and organized in the order of the listed
 `JNCIP-DC <https://www.juniper.net/us/en/training/certification/certification-tracks/data-center-track?tab=jncip-dc>`_
 exam objectives.  The primary reference has been the
-``_
+`QFX5100 Series <https://www.amazon.com/Juniper-QFX5100-Comprehensive-Building-Next-Generation/dp/1491949570/>`_
 book, but other references such as the
-``
+`MX Series <https://www.amazon.com/Juniper-MX-Comprehensive-Guide-Technologies/dp/1491932724/>`_
 book and official Juniper documentation have been used.  I've tried to
 remember to credit any sources I've had while taking notes, but I'm sure
 I've left sources off.  If you're aware of a particular source for
 something, please let me know so that I can attribute credit.
+
+.. note::
+   Links to Amazon may be present.  They are *not* affiliate links.  I
+   do not make any money if you follow them.  I do not make any money
+   for any link you follow on this site.  There is no monetization
+   whatsoever here.  I'm only interested in publishing my JNCIP-DC notes
+   as open source.
 
 These are my personal notes -- they're not guaranteed to be accurate or
 representative of the exam in any way, shape, or form.  If you find
