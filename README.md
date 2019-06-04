@@ -2,7 +2,7 @@
 
 This repository contains both the source and the compiled HTML for
 https://jncip-dc.tylerc.me, a set of notes on the
-(JNCIP-DC exam)[https://www.juniper.net/us/en/training/certification/certification-tracks/data-center-track?tab=jncip-dc].
+[JNCIP-DC exam](https://www.juniper.net/us/en/training/certification/certification-tracks/data-center-track?tab=jncip-dc).
 
 ## Genesis
 
@@ -35,7 +35,7 @@ Ultimately, contributions are welcome either in the form of pull
 requests that offer direct updates to the source or GitHub issues that
 lead to updates and contributions to this project.  In either case, I
 will update the list of
-(Contributors)[https://jncip-dc.tylerc.me/contributors.html] unless
+[Contributors](https://jncip-dc.tylerc.me/contributors.html) unless
 explicitly requested otherwise.
 
 ### Diagrams
