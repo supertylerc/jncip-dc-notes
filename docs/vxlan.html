@@ -1,0 +1,450 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>VXLAN &#8212; jncip-dc-notes  documentation</title>
+    <link rel="stylesheet" href="static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="static/documentation_options.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="static/underscore.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <script type="text/javascript" src="static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Contributors" href="contributors.html" />
+    <link rel="prev" title="Layer 3 Fabrics" href="layer-3-fabrics.html" />
+   
+  <link rel="stylesheet" href="static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="vxlan">
+<h1>VXLAN<a class="headerlink" href="#vxlan" title="Permalink to this headline">¶</a></h1>
+<p>This blueprint item primarily covers the following topics:</p>
+<ul class="simple">
+<li><p>L2VPN Control Planes</p></li>
+<li><p><a class="reference internal" href="#multicast-control-plane"><span class="std std-ref">Multicast Control Plane</span></a></p></li>
+<li><p><a class="reference internal" href="#data-plane"><span class="std std-ref">Data Plane</span></a></p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the VXLAN section of the blueprint indicates L2VPN Control
+Planes, they are not covered here; instead, they are covered on the
+<a class="reference internal" href="vxlan-evpn.html#vxlan-evpn"><span class="std std-ref">EVPN VXLAN Signaling</span></a> page.  I’m unaware of a different L2VPN control
+plane that uses VXLAN for encapsulation; perhaps the blueprint means
+MPLS and/or GRE L2VPNs, but that isn’t clear since the item is listed
+under VXLAN.</p>
+</div>
+<p>Additionally, this page covers a brief introduction to VXLAN and why it
+exists in the <a class="reference internal" href="#introduction-to-vxlan"><span class="std std-ref">Introduction to VXLAN</span></a> section.</p>
+<p>Finally, because I’m not quite sure where in the blueprint some items
+might (or might not) fall, the following sections are written to
+describe platform-dependent concepts:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#vxlan-gateways"><span class="std std-ref">VxLAN L2 and L3 Gateways</span></a></p></li>
+<li><p><a class="reference internal" href="#asymmetric-vs-symmetric-irb"><span class="std std-ref">Asymmetric vs Syemmtric IRB</span></a></p></li>
+<li><p><a class="reference internal" href="#hardware-positioning"><span class="std std-ref">Hardware Positioning</span></a></p></li>
+</ul>
+<div class="section" id="introduction-to-vxlan">
+<span id="id1"></span><h2>Introduction to VXLAN<a class="headerlink" href="#introduction-to-vxlan" title="Permalink to this headline">¶</a></h2>
+<p>Modern data centers require greater scale and security than in years
+past.  Traditionally, operators have dealt with spanning tree in the
+data center.  While spanning tree itself is not a terrible technology
+and has its uses, it does result in unused links, which means network
+architects and operators needed to vastly overprovision their network
+links in order to have enough bandwidth available to avoid congestion.
+This may have come in the form of using 40G links where 10G links would
+have otherwise been enough or in the form of using multiple ports in
+a LAG.  Both solutions are expensive and can have disastrous failover
+consequences, such as a LAG member failing and resulting in insufficient
+bandwidth on the active path (degredation of service) or link failures
+causing TCNs to be genereated (brief outages as MAC tables are flushed
+throughout the network).  Additionally, the scale of every switch in the
+data center must also account for the total possible number of MAC
+bindings, ARP bindings, and IP addresses across all devices in the
+broadcast domain, which may result in purchasing more expensive hardware
+than might otherwise be required.</p>
+<div class="section" id="layer-3-fabrics-and-layer-2-l2vpns">
+<h3>Layer 3 Fabrics and Layer 2 L2VPNs<a class="headerlink" href="#layer-3-fabrics-and-layer-2-l2vpns" title="Permalink to this headline">¶</a></h3>
+<p>One solution to the above problem is <span class="xref std std-ref">layer-3-fabrics</span>; however, a
+purely layer 3 fabric introduces its own issues: complexity in the form
+of requiring rack awareness; IP planning difficulties; and an inability
+to support highly available components that require layer 2 adjacency,
+such as clustered firewalls, load balancers, and VRRP-based applications
+such as MySQL with <code class="docutils literal notranslate"><span class="pre">keepalived</span></code> (which uses VRRP, a protocol that
+communicates to the <code class="docutils literal notranslate"><span class="pre">224.0.0.18</span></code> multicast group, which is link-local
+and not routable).</p>
+<p>In order to solve the problems that an IP fabric introduces, a layer 2
+overlay can be used.  This is something that’s been done in the service
+provider realm for several years in the forms of L2VPN/Pseudowires and
+VPLS.  These technologies use MPLS to transport layer 2 frames across a
+network without requiring the devices in the middle to know the source
+and destination MAC addresses, ARP bindings, etc.  However, devices in
+the data center traditionally may not have MPLS functionality all the
+way to the server point of attachment, and MPLS features are frequently
+expensive, so a different way was devised.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Cost isn’t the only reason VXLAN was created.  Complexity is another;
+MPLS requires additional protocols and requires that every device
+support it end-to-end; VXLAN does not.  With VXLAN, only the ingress
+and egress devices need to know how to deal with VXLAN; every other
+device in the middle just sees an IP packet.  Additionally, VXLAN
+requires protocols that are frequently used anyway: either a
+multicast routing protocol or BGP.</p>
+</div>
+</div>
+<div class="section" id="encapsulation">
+<h3>Encapsulation<a class="headerlink" href="#encapsulation" title="Permalink to this headline">¶</a></h3>
+<p>VXLAN transports layer 2 frames by encapsulating them into an IP packet
+with a UDP header.  With VXLAN, an operator maps a VLAN ID to a VNI.
+Recall that VLAN IDs are 12 bits in length and can thus support up to
+4,096 VLANs.  VXLAN VNIs (Virtual Network Identifiers), on the other
+hand, are 24 bits in length and can support up to approximately 16
+million unique IDs.  Ultimately, with enough planning, this means that
+your tenant scale is now limited to ~4,096 per switch and 16 million
+across the entire footprint.</p>
+</div>
+</div>
+<div class="section" id="multicast-control-plane">
+<span id="id2"></span><h2>Multicast Control Plane<a class="headerlink" href="#multicast-control-plane" title="Permalink to this headline">¶</a></h2>
+<p>Now that we know a little bit about the motivation of VXLAN, we can look
+at the control plane protocols that support it.  A key requirement of a
+layer 2 overlay (or VPN) is the ability to transport BUM traffic.  With
+VXLAN, there are two primary ways to accomplish this: multicast and
+ingress (or head-end) replication.  This page covers multicast, while
+the <a class="reference internal" href="vxlan-evpn.html#vxlan-evpn"><span class="std std-ref">EVPN VXLAN Signaling</span></a> page covers ingress replication.</p>
+<div class="section" id="pim">
+<h3>PIM<a class="headerlink" href="#pim" title="Permalink to this headline">¶</a></h3>
+<p>The multicast control plane for VXLAN exists primary to support the
+<a class="reference internal" href="#data-plane"><span class="std std-ref">Data Plane</span></a>, covered later.  The only way to use multicast for BUM
+traffic is to run PIM in your fabric.  You associate each VNI with a
+particular multicast group.  This is because when a segment needs to
+send a BUM packet, it must be delivered to all interested receivers.
+For this reason, the same VNI must be associated with the same group
+on all VTEPs.  Eventually, with enough VNIs, you may run into issues
+with scaling the number of multicast groups.  You will start mapping
+multiple VNIs to a single multicast group, which will result in
+inefficient forwarding of BUM traffic to uninterested VTEPs.</p>
+<p>The best way to deploy an RP is to use <a class="reference internal" href="#anycast-rp"><span class="std std-ref">Anycast RP</span></a>.  You use
+PIM-SM and will need reachability via some IGP.  The RP should also be
+configured on spines, not leafs.  There are many options for configuring
+RP selection, such as static, bootstrap RP, or auto RP.  For the sake of
+simplicity, when combined with <a class="reference internal" href="#anycast-rp"><span class="std std-ref">Anycast RP</span></a>, a static configuration
+is likely the easiest option.</p>
+<p>Note that the QFX does not support PIM BiDir <a class="footnote-reference brackets" href="#f4" id="id3">4</a>.</p>
+</div>
+<div class="section" id="anycast-rp">
+<span id="id4"></span><h3>Anycast RP<a class="headerlink" href="#anycast-rp" title="Permalink to this headline">¶</a></h3>
+<p>Anycast RP uses the same IP address for the RP on multiple devices.
+Anycast RP can be configured either with or without MSDP; for the sake
+of simplicity (and assuming this exam isn’t focusing heavily on
+multicast), we’ll only examine the design without MSDP.</p>
+<p>When using Anycast RP, you must configure at least two loopback IP
+addresses: a unique IP per spine and a shared IP per spine.  The shared
+IP per spine is the Anycast IP, and the unique IP is used as the router
+ID and so that the routers can sync their multicast states.  When
+configuring the shared anycast IP, you have two options: you can either
+configure the unique IP as the <code class="docutils literal notranslate"><span class="pre">primary</span></code> IP; or you can configure the
+anycast shared IP under a different unit.</p>
+<p>You must configure an <code class="docutils literal notranslate"><span class="pre">rp-set</span></code> for <code class="docutils literal notranslate"><span class="pre">pim-anycast</span></code> that includes all
+other Anycast RP members; the IP address used when defining the other
+members should be the unique IP address of the spine.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Instead of configuring an <code class="docutils literal notranslate"><span class="pre">rp-set</span></code> with each spine’s unique IP
+address, you can use MSDP.  However, that is out of scope for this
+guide as it seems unlikely (though not impossible) to appear on the
+exam.  For completeness, you should read the
+<a class="reference external" href="https://www.juniper.net/documentation/en_US/junos/topics/topic-map/mcast-pim-anycast-rp.html">Example: Configuring Multiple RPs in a Domain with Anycast RP</a>
+configuration guide from Juniper.  Additionally, the configuration of
+MSDP is likely more complicated than configuring an <code class="docutils literal notranslate"><span class="pre">rp-set</span></code> given
+the scale.</p>
+</div>
+</div>
+</div>
+<div class="section" id="data-plane">
+<span id="id5"></span><h2>Data Plane<a class="headerlink" href="#data-plane" title="Permalink to this headline">¶</a></h2>
+<p>This section describes the VXLAN data plane for two different
+operations: <a class="reference internal" href="#dp-known-unicast"><span class="std std-ref">Data Plane for Known Unicast Traffic</span></a> and <a class="reference internal" href="#dp-bum"><span class="std std-ref">Multicast Data Plane for BUM Traffic</span></a>.  It also contains
+a section explaining the default 802.1q stripping behavior and how to
+override this in the <a class="reference internal" href="#dot1q-stripping"><span class="std std-ref">802.1Q Stripping</span></a> section.</p>
+<div class="section" id="q-stripping">
+<span id="dot1q-stripping"></span><h3>802.1Q Stripping<a class="headerlink" href="#q-stripping" title="Permalink to this headline">¶</a></h3>
+<p>It’s worth noting that the default behavior of a VTEP is to strip the
+VLAN ID before encapsulating a frame in a VxLAN packet.  The reverse is
+also true: if a VxLAN packet is decapsulated and a VLAN ID is present,
+the frame is discarded.  This behavior can be modified on both the QFX
+and MX platforms.</p>
+<p>On the MX, both the encapsulating and decapsulating behaviors are
+modified at the <code class="docutils literal notranslate"><span class="pre">[bridge-domains</span> <span class="pre">&lt;name&gt;</span> <span class="pre">vxlan]</span></code> hierarchy.  For
+example, <code class="docutils literal notranslate"><span class="pre">set</span> <span class="pre">bridge-domains</span> <span class="pre">bd273</span> <span class="pre">vxlan</span> <span class="pre">encapsulate-inner-vlan</span></code> will
+preserve the inner VLAN ID, and
+<code class="docutils literal notranslate"><span class="pre">set</span> <span class="pre">bridge-domains</span> <span class="pre">bd273</span> <span class="pre">vxlan</span> <span class="pre">decapsulate-accept-inner-vlan</span></code> will
+accept decapsulated frames with a VLAN ID present.</p>
+<p>On a QFX, the hierarchy level for preserving VLAN IDs when encapsulating
+is done at the <code class="docutils literal notranslate"><span class="pre">[vlans</span> <span class="pre">&lt;name&gt;</span> <span class="pre">vxlan]</span></code> level, while accepting
+decapsulated frames with a VLAN ID present is done at the
+<code class="docutils literal notranslate"><span class="pre">[protocols</span> <span class="pre">l2-learning]</span></code> level.  For example,
+<code class="docutils literal notranslate"><span class="pre">set</span> <span class="pre">vlans</span> <span class="pre">vlan273</span> <span class="pre">vxlan</span> <span class="pre">encapsulate-inner-vlan</span></code> and
+<code class="docutils literal notranslate"><span class="pre">set</span> <span class="pre">protocols</span> <span class="pre">l2-learning</span> <span class="pre">decapsulate-accept-inner-vlan</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The option is the same between both the MX and the QFX, but where it
+is applied is different.  The MX can perform these actions separately
+on multiple bridge domains, while the QFX applies them at a global
+level.</p>
+</div>
+</div>
+<div class="section" id="data-plane-for-known-unicast-traffic">
+<span id="dp-known-unicast"></span><h3>Data Plane for Known Unicast Traffic<a class="headerlink" href="#data-plane-for-known-unicast-traffic" title="Permalink to this headline">¶</a></h3>
+<p>VXLAN traffic is encapsulated and decapsulated by a VTEP.  A VTEP can be
+either a hardware (such as a QFX5100) or software (such as Open vSwitch)
+device.  This encapsulation consists of a new VXLAN header, a new UDP
+header, a new IP header, and a new Ethernet header.  The information for
+each header is described in the list below.</p>
+<ul class="simple">
+<li><p>Ethernet Header: This is a normal Ethernet header; its source MAC will
+be the SMAC of the egress switchport; the destination MAC will be the
+DMAC of the next hop IP address.</p></li>
+<li><p>IP Header: The source IP will be the local VTEP; the destination IP
+will be the remote VTEP that contains the remote host of the original
+IP packet.</p></li>
+<li><p>UDP Header: The source port is a random port based on a hashing
+algorithm of the original payload headers, and that hashing algorithm
+may depend on the specific hardware platform.  The destination port is
+usually the well-known (registered) VXLAN port of <code class="docutils literal notranslate"><span class="pre">4789</span></code>, though
+this can be changed on some implementations of VXLAN (especially those
+that are software-based, such as the Linux kernel or Open vSwitch).</p></li>
+<li><p>VXLAN Header: This is an 8 byte header that contains the VNI, a 24-bit
+field.  8 bits are used for flags, and the other 32 bits are reserved
+for future use.</p></li>
+</ul>
+<p>The ingress VTEP adds these headers, and the egress VTEP removes them.
+Any devices between the VTEPs treat the packet as a normal packet,
+forwarding according to that platforms hashing algorithm for the outter
+packet.</p>
+</div>
+<div class="section" id="multicast-data-plane-for-bum-traffic">
+<span id="dp-bum"></span><h3>Multicast Data Plane for BUM Traffic<a class="headerlink" href="#multicast-data-plane-for-bum-traffic" title="Permalink to this headline">¶</a></h3>
+<p>The multicast data plane is simple compared to the
+<a class="reference internal" href="#multicast-control-plane"><span class="std std-ref">Multicast Control Plane</span></a>.  At a high level, a BUM frame is
+encapsulated in a new VXLAN packet, including new layer 2, 3, and 4
+headers.  When it arrives on the destination VTEP(s), it is
+decapsulated, revealing the original segment.  This is similar to the
+operations in the <a class="reference internal" href="#dp-known-unicast"><span class="std std-ref">Data Plane for Known Unicast Traffic</span></a>.  The biggest difference is
+that the destination IP is not that of the destination VTEP but is
+instead that of the multicast group associated with the VNI.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In addition to BUM traffic, the multicast topology is used to
+discover remote VTEPs.</p>
+</div>
+<p>When dealing with a software VTEP, an IGMP Join is translated into a PIM
+Register by the PIM DR.  These PIM Register messages are unicast to the
+RP.  The RP decapsulates the message and forwards it to the destination
+VTEP.  At this point, the tree switches from an RPT (<code class="docutils literal notranslate"><span class="pre">(*,G)</span></code> state) to
+an SPT (<code class="docutils literal notranslate"><span class="pre">(S,G)</span></code> state).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Multicast isn’t heavily called out in the JNCIP-DC syllabus <a class="footnote-reference brackets" href="#f5" id="id6">5</a>,
+so I expect it to be covered very lightly.  There seems to be a
+heavier focus in both documentation and the syllabus on
+<a class="reference internal" href="vxlan-evpn.html#vxlan-evpn"><span class="std std-ref">EVPN VXLAN Signaling</span></a>.  For this reason, these notes do not attempt to be
+an exhaustive multicast reference or even a primer.</p>
+</div>
+</div>
+</div>
+<div class="section" id="vxlan-l2-and-l3-gateways">
+<span id="vxlan-gateways"></span><h2>VxLAN L2 and L3 Gateways<a class="headerlink" href="#vxlan-l2-and-l3-gateways" title="Permalink to this headline">¶</a></h2>
+<p>Coming Soon!</p>
+</div>
+<div class="section" id="asymmetric-vs-syemmtric-irb">
+<span id="asymmetric-vs-symmetric-irb"></span><h2>Asymmetric vs Syemmtric IRB<a class="headerlink" href="#asymmetric-vs-syemmtric-irb" title="Permalink to this headline">¶</a></h2>
+<p>Coming Soon!</p>
+</div>
+<div class="section" id="hardware-positioning">
+<span id="id7"></span><h2>Hardware Positioning<a class="headerlink" href="#hardware-positioning" title="Permalink to this headline">¶</a></h2>
+<p>Hardware positioning depends on the design.  The design depends on
+hardware selection.  This cyclical dependency can be difficult to tease
+apart.  However, there is a simple rule of thumb:</p>
+<p>If you want your leaf/top-of-rack layer to provide VxLAN Layer 3 gateway
+services, do not use the following hardware platforms:</p>
+<ul class="simple">
+<li><p>EX4300 (Broadcom Trident 2)</p></li>
+<li><p>EX4600 (Broadcom Trident 2)</p></li>
+<li><p>QFX5100 (Broadcom Trident 2)</p></li>
+<li><p>QFX5200 (Broadcom Tomahawk)</p></li>
+</ul>
+<p>This is because of the ASICs used.  These switches all use either the
+Broadcom Trident 2 or Tomahawk chipsets, which do not support the
+required functionality in hardware.  If you already have an investment
+in these platforms, then it would be best to use them for VxLAN Layer 2
+gateway services and implement a spine layer with the QFX10k or MX
+Series devices for your VxLAN Layer 3 gateway services.  However, if you
+are starting fresh, consider the QFX5110 or QFX10k Series devices for
+your leaf/top-of-rack layer as they will allow you to perform VxLAN
+Layer 3 gateway services, thus reducing the traffic tromboning for
+inter-VxLAN routing in your data center fabric.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>There are ways around this with other vendors, but it is unclear if
+Juniper supports these workarounds.</p>
+</div>
+<p>If you want VxLAN Layer 3 gateway services, the following platforms can
+be used:</p>
+<ul class="simple">
+<li><p>QFX5110 Series (Broadcom Trident 2+)</p></li>
+<li><p>QFX10000 Series (Juniper Q5)</p></li>
+<li><p>MX Series (Juniper Trio)</p></li>
+</ul>
+<p>The QFX5110 is based on the Broadcom Trident 2+ and can perform VxLAN
+Layer 3 gateway services.  The QFX10000 Series switches run a custom
+Juniper ASIC known as the Q5.  This is also capable of performing the
+VxLAN Layer 3 gateway function.  The MX Series uses Trio, which is a
+custom chipset that is incredibly flexible and can perform the VxLAN
+Layer 3 gateway services.</p>
+<p>Ultimately, most of these platforms have some limitations to consider
+<a class="footnote-reference brackets" href="#f6" id="id8">6</a>.  A general rule of thumb is to use the Trident 2 and Tomahawk
+chipsets for Layer 2 VxLAN and other chipsets for Layer 3 VxLAN
+services or to use newer chipsets for every tier.</p>
+</div>
+<div class="section" id="configuration">
+<span id="id9"></span><h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>TODO: Add configuration examples for a VXLAN multicast control plane
+using OSPF as the IGP and <a class="reference internal" href="#anycast-rp"><span class="std std-ref">Anycast RP</span></a>.</p>
+<p class="rubric">Footnotes</p>
+<dl class="footnote brackets">
+<dt class="label" id="f1"><span class="brackets">1</span></dt>
+<dd><p><a class="reference external" href="https://www.amazon.com/Juniper-QFX5100-Comprehensive-Building-Next-Generation/dp/1491949570/">Juniper QFX5100 Series</a></p>
+</dd>
+<dt class="label" id="f2"><span class="brackets">2</span></dt>
+<dd><p><a class="reference external" href="https://tools.ietf.org/html/rfc7938#section-5.2">RFC7938: Use of BGP in Large-Scale Data Centers, Section 5.2: EBGP Configuration for Clos Topology</a></p>
+</dd>
+<dt class="label" id="f3"><span class="brackets">3</span></dt>
+<dd><p><a class="reference external" href="https://learning.oreilly.com/library/view/bgp-in-the/9781491983416/">BGP in the Data Center, Chapter 2, ASN Numbering Model</a></p>
+</dd>
+<dt class="label" id="f4"><span class="brackets"><a class="fn-backref" href="#id3">4</a></span></dt>
+<dd><p><a class="reference external" href="https://apps.juniper.net/feature-explorer/feature-info.html?fKey=3786&amp;fn=Bidirectional%20PIM">Junos Feature Explorer - Bidirectional PIM</a></p>
+</dd>
+<dt class="label" id="f5"><span class="brackets"><a class="fn-backref" href="#id6">5</a></span></dt>
+<dd><p><a class="reference external" href="https://www.juniper.net/us/en/training/certification/certification-tracks/data-center-track?tab=jncip-dc">JNCIP-DC Syllabus</a></p>
+</dd>
+<dt class="label" id="f6"><span class="brackets"><a class="fn-backref" href="#id8">6</a></span></dt>
+<dd><p><a class="reference external" href="https://www.juniper.net/documentation/en_US/junos/topics/concept/vxlan-constraints-qfx-series.html">VXLAN Constraints on QFX Series and EX Series Switches</a></p>
+</dd>
+</dl>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">jncip-dc-notes</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="dc-deployment-and-management.html">Data Center Deployment and Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mc-lag.html">Multi-Chassis LAG (MC-LAG)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="layer-2-fabrics.html">Layer 2 Fabrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="layer-3-fabrics.html">Layer 3 Fabrics</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">VXLAN</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction-to-vxlan">Introduction to VXLAN</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#layer-3-fabrics-and-layer-2-l2vpns">Layer 3 Fabrics and Layer 2 L2VPNs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#encapsulation">Encapsulation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#multicast-control-plane">Multicast Control Plane</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pim">PIM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#anycast-rp">Anycast RP</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#data-plane">Data Plane</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#q-stripping">802.1Q Stripping</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#data-plane-for-known-unicast-traffic">Data Plane for Known Unicast Traffic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#multicast-data-plane-for-bum-traffic">Multicast Data Plane for BUM Traffic</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#vxlan-l2-and-l3-gateways">VxLAN L2 and L3 Gateways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#asymmetric-vs-syemmtric-irb">Asymmetric vs Syemmtric IRB</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#hardware-positioning">Hardware Positioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributors.html">Contributors</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="layer-3-fabrics.html" title="previous chapter">Layer 3 Fabrics</a></li>
+      <li>Next: <a href="contributors.html" title="next chapter">Contributors</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Tyler Christiansen.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/vxlan.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

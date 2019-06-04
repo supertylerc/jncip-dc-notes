@@ -84,6 +84,7 @@ the contributor requests otherwise.
    mc-lag
    layer-2-fabrics
    layer-3-fabrics
+   vxlan
    contributors
 
 * :ref:`search`
