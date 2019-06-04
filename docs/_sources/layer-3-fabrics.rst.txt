@@ -1,3 +1,5 @@
+.. _layer-3-fabrics:
+
 Layer 3 Fabrics
 ===============
 

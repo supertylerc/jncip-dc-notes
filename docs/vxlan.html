@@ -38,7 +38,7 @@
 <ul class="simple">
 <li><p>L2VPN Control Planes</p></li>
 <li><p><a class="reference internal" href="#multicast-control-plane"><span class="std std-ref">Multicast Control Plane</span></a></p></li>
-<li><p><a class="reference internal" href="#data-plane"><span class="std std-ref">Data Plane</span></a></p></li>
+<li><p><a class="reference internal" href="#mcast-data-plane"><span class="std std-ref">Data Plane</span></a></p></li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -80,7 +80,7 @@ broadcast domain, which may result in purchasing more expensive hardware
 than might otherwise be required.</p>
 <div class="section" id="layer-3-fabrics-and-layer-2-l2vpns">
 <h3>Layer 3 Fabrics and Layer 2 L2VPNs<a class="headerlink" href="#layer-3-fabrics-and-layer-2-l2vpns" title="Permalink to this headline">¶</a></h3>
-<p>One solution to the above problem is <span class="xref std std-ref">layer-3-fabrics</span>; however, a
+<p>One solution to the above problem is <a class="reference internal" href="layer-3-fabrics.html#layer-3-fabrics"><span class="std std-ref">Layer 3 Fabrics</span></a>; however, a
 purely layer 3 fabric introduces its own issues: complexity in the form
 of requiring rack awareness; IP planning difficulties; and an inability
 to support highly available components that require layer 2 adjacency,
@@ -131,10 +131,10 @@ the <a class="reference internal" href="vxlan-evpn.html#vxlan-evpn"><span class=
 <div class="section" id="pim">
 <h3>PIM<a class="headerlink" href="#pim" title="Permalink to this headline">¶</a></h3>
 <p>The multicast control plane for VXLAN exists primary to support the
-<a class="reference internal" href="#data-plane"><span class="std std-ref">Data Plane</span></a>, covered later.  The only way to use multicast for BUM
-traffic is to run PIM in your fabric.  You associate each VNI with a
-particular multicast group.  This is because when a segment needs to
-send a BUM packet, it must be delivered to all interested receivers.
+<a class="reference internal" href="#mcast-data-plane"><span class="std std-ref">Data Plane</span></a>, covered later.  The only way to use multicast
+for BUM traffic is to run PIM in your fabric.  You associate each VNI
+with a particular multicast group.  This is because when a segment needs
+to send a BUM packet, it must be delivered to all interested receivers.
 For this reason, the same VNI must be associated with the same group
 on all VTEPs.  Eventually, with enough VNIs, you may run into issues
 with scaling the number of multicast groups.  You will start mapping
@@ -178,7 +178,7 @@ the scale.</p>
 </div>
 </div>
 <div class="section" id="data-plane">
-<span id="id5"></span><h2>Data Plane<a class="headerlink" href="#data-plane" title="Permalink to this headline">¶</a></h2>
+<span id="mcast-data-plane"></span><h2>Data Plane<a class="headerlink" href="#data-plane" title="Permalink to this headline">¶</a></h2>
 <p>This section describes the VXLAN data plane for two different
 operations: <a class="reference internal" href="#dp-known-unicast"><span class="std std-ref">Data Plane for Known Unicast Traffic</span></a> and <a class="reference internal" href="#dp-bum"><span class="std std-ref">Multicast Data Plane for BUM Traffic</span></a>.  It also contains
 a section explaining the default 802.1q stripping behavior and how to
@@ -261,7 +261,7 @@ VTEP.  At this point, the tree switches from an RPT (<code class="docutils liter
 an SPT (<code class="docutils literal notranslate"><span class="pre">(S,G)</span></code> state).</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Multicast isn’t heavily called out in the JNCIP-DC syllabus <a class="footnote-reference brackets" href="#f5" id="id6">5</a>,
+<p>Multicast isn’t heavily called out in the JNCIP-DC syllabus <a class="footnote-reference brackets" href="#f5" id="id5">5</a>,
 so I expect it to be covered very lightly.  There seems to be a
 heavier focus in both documentation and the syllabus on
 <a class="reference internal" href="vxlan-evpn.html#vxlan-evpn"><span class="std std-ref">EVPN VXLAN Signaling</span></a>.  For this reason, these notes do not attempt to be
@@ -278,7 +278,7 @@ an exhaustive multicast reference or even a primer.</p>
 <p>Coming Soon!</p>
 </div>
 <div class="section" id="hardware-positioning">
-<span id="id7"></span><h2>Hardware Positioning<a class="headerlink" href="#hardware-positioning" title="Permalink to this headline">¶</a></h2>
+<span id="id6"></span><h2>Hardware Positioning<a class="headerlink" href="#hardware-positioning" title="Permalink to this headline">¶</a></h2>
 <p>Hardware positioning depends on the design.  The design depends on
 hardware selection.  This cyclical dependency can be difficult to tease
 apart.  However, there is a simple rule of thumb:</p>
@@ -319,12 +319,12 @@ VxLAN Layer 3 gateway function.  The MX Series uses Trio, which is a
 custom chipset that is incredibly flexible and can perform the VxLAN
 Layer 3 gateway services.</p>
 <p>Ultimately, most of these platforms have some limitations to consider
-<a class="footnote-reference brackets" href="#f6" id="id8">6</a>.  A general rule of thumb is to use the Trident 2 and Tomahawk
+<a class="footnote-reference brackets" href="#f6" id="id7">6</a>.  A general rule of thumb is to use the Trident 2 and Tomahawk
 chipsets for Layer 2 VxLAN and other chipsets for Layer 3 VxLAN
 services or to use newer chipsets for every tier.</p>
 </div>
 <div class="section" id="configuration">
-<span id="id9"></span><h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<span id="id8"></span><h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
 <p>TODO: Add configuration examples for a VXLAN multicast control plane
 using OSPF as the IGP and <a class="reference internal" href="#anycast-rp"><span class="std std-ref">Anycast RP</span></a>.</p>
 <p class="rubric">Footnotes</p>
@@ -341,10 +341,10 @@ using OSPF as the IGP and <a class="reference internal" href="#anycast-rp"><span
 <dt class="label" id="f4"><span class="brackets"><a class="fn-backref" href="#id3">4</a></span></dt>
 <dd><p><a class="reference external" href="https://apps.juniper.net/feature-explorer/feature-info.html?fKey=3786&amp;fn=Bidirectional%20PIM">Junos Feature Explorer - Bidirectional PIM</a></p>
 </dd>
-<dt class="label" id="f5"><span class="brackets"><a class="fn-backref" href="#id6">5</a></span></dt>
+<dt class="label" id="f5"><span class="brackets"><a class="fn-backref" href="#id5">5</a></span></dt>
 <dd><p><a class="reference external" href="https://www.juniper.net/us/en/training/certification/certification-tracks/data-center-track?tab=jncip-dc">JNCIP-DC Syllabus</a></p>
 </dd>
-<dt class="label" id="f6"><span class="brackets"><a class="fn-backref" href="#id8">6</a></span></dt>
+<dt class="label" id="f6"><span class="brackets"><a class="fn-backref" href="#id7">6</a></span></dt>
 <dd><p><a class="reference external" href="https://www.juniper.net/documentation/en_US/junos/topics/concept/vxlan-constraints-qfx-series.html">VXLAN Constraints on QFX Series and EX Series Switches</a></p>
 </dd>
 </dl>

@@ -33,7 +33,7 @@
           <div class="body" role="main">
             
   <div class="section" id="layer-3-fabrics">
-<h1>Layer 3 Fabrics<a class="headerlink" href="#layer-3-fabrics" title="Permalink to this headline">¶</a></h1>
+<span id="id1"></span><h1>Layer 3 Fabrics<a class="headerlink" href="#layer-3-fabrics" title="Permalink to this headline">¶</a></h1>
 <p>This blueprint item primarily covers the following topics:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#clos"><span class="std std-ref">3-Stage Clos Architecture</span></a></p></li>
@@ -65,11 +65,11 @@ its source (excluding advanced services such as overlay networking,
 firewalls, load balancers, etc.).</p>
 </div>
 <div class="section" id="ip-fabric-routing">
-<span id="id1"></span><h2>IP Fabric Routing<a class="headerlink" href="#ip-fabric-routing" title="Permalink to this headline">¶</a></h2>
+<span id="id2"></span><h2>IP Fabric Routing<a class="headerlink" href="#ip-fabric-routing" title="Permalink to this headline">¶</a></h2>
 <p>When designing an IP fabric, there are two primary designs, though both
 leverage BGP.</p>
 <div class="section" id="ibgp">
-<span id="id2"></span><h3>iBGP<a class="headerlink" href="#ibgp" title="Permalink to this headline">¶</a></h3>
+<span id="id3"></span><h3>iBGP<a class="headerlink" href="#ibgp" title="Permalink to this headline">¶</a></h3>
 <p>In an iBGP design, an IGP such as OSPF or IS-IS is used to provide
 multipathing.  iBGP peerings are formed over loopback interfaces, and
 route reflectors can be used to increase the scale of the solution.
@@ -84,16 +84,16 @@ path identifier to a prefix advertisement; because of this, all routers
 at the spine level must support and be configured for BGP ADD-PATH.</p>
 </div>
 <div class="section" id="ebgp">
-<span id="id3"></span><h3>eBGP<a class="headerlink" href="#ebgp" title="Permalink to this headline">¶</a></h3>
+<span id="id4"></span><h3>eBGP<a class="headerlink" href="#ebgp" title="Permalink to this headline">¶</a></h3>
 <p>With eBGP, there is no IGP – BGP acts in a similar role as an IGP.  In
 this design, each leaf node is given a unique ASN and all spines either
 share the same ASN or have unique ASNs per node.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The QFX5100 Series book <a class="footnote-reference brackets" href="#f1" id="id4">1</a>, particularly Chapter 7: IP Fabrics
+<p>The QFX5100 Series book <a class="footnote-reference brackets" href="#f1" id="id5">1</a>, particularly Chapter 7: IP Fabrics
 (Clos), seems to suggest that the spine switches should each have a
-unique ASN.  However, multiple other sources such as RFC7938 <a class="footnote-reference brackets" href="#f2" id="id5">2</a>
-and BGP in the Data Center <a class="footnote-reference brackets" href="#f3" id="id6">3</a> suggest giving the spines the same
+unique ASN.  However, multiple other sources such as RFC7938 <a class="footnote-reference brackets" href="#f2" id="id6">2</a>
+and BGP in the Data Center <a class="footnote-reference brackets" href="#f3" id="id7">3</a> suggest giving the spines the same
 ASN while allowing the leafs to have unique ASNs.  This is likely to
 avoid the nead for <code class="docutils literal notranslate"><span class="pre">multipath</span> <span class="pre">multiple-as</span></code> on every leaf and to
 simplify spine configuration.  However, even following this numbering
@@ -126,7 +126,7 @@ because they can no longer assume similar behavior amongst nodes.</p>
 </div>
 </div>
 <div class="section" id="ip-fabric-scaling">
-<span id="id7"></span><h2>IP Fabric Scaling<a class="headerlink" href="#ip-fabric-scaling" title="Permalink to this headline">¶</a></h2>
+<span id="id8"></span><h2>IP Fabric Scaling<a class="headerlink" href="#ip-fabric-scaling" title="Permalink to this headline">¶</a></h2>
 <p>The scalability of an IP fabric is largely limited by three things:</p>
 <ul class="simple">
 <li><p>the acceptable oversubscription ratio</p></li>
@@ -221,13 +221,13 @@ of your fabric switches but not others.</p>
 </dl>
 <p class="rubric">Footnotes</p>
 <dl class="footnote brackets">
-<dt class="label" id="f1"><span class="brackets"><a class="fn-backref" href="#id4">1</a></span></dt>
+<dt class="label" id="f1"><span class="brackets"><a class="fn-backref" href="#id5">1</a></span></dt>
 <dd><p><a class="reference external" href="https://www.amazon.com/Juniper-QFX5100-Comprehensive-Building-Next-Generation/dp/1491949570/">Juniper QFX5100 Series</a></p>
 </dd>
-<dt class="label" id="f2"><span class="brackets"><a class="fn-backref" href="#id5">2</a></span></dt>
+<dt class="label" id="f2"><span class="brackets"><a class="fn-backref" href="#id6">2</a></span></dt>
 <dd><p><a class="reference external" href="https://tools.ietf.org/html/rfc7938#section-5.2">RFC7938: Use of BGP in Large-Scale Data Centers, Section 5.2: EBGP Configuration for Clos Topology</a></p>
 </dd>
-<dt class="label" id="f3"><span class="brackets"><a class="fn-backref" href="#id6">3</a></span></dt>
+<dt class="label" id="f3"><span class="brackets"><a class="fn-backref" href="#id7">3</a></span></dt>
 <dd><p><a class="reference external" href="https://learning.oreilly.com/library/view/bgp-in-the/9781491983416/">BGP in the Data Center, Chapter 2, ASN Numbering Model</a></p>
 </dd>
 </dl>

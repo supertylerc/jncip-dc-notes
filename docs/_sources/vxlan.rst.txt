@@ -5,7 +5,7 @@ This blueprint item primarily covers the following topics:
 
 * L2VPN Control Planes
 * :ref:`multicast-control-plane`
-* :ref:`data-plane`
+* :ref:`mcast-data-plane`
 
 .. note::
    Although the VXLAN section of the blueprint indicates L2VPN Control
@@ -109,10 +109,10 @@ PIM
 ^^^
 
 The multicast control plane for VXLAN exists primary to support the
-:ref:`data-plane`, covered later.  The only way to use multicast for BUM
-traffic is to run PIM in your fabric.  You associate each VNI with a
-particular multicast group.  This is because when a segment needs to
-send a BUM packet, it must be delivered to all interested receivers.
+:ref:`mcast-data-plane`, covered later.  The only way to use multicast
+for BUM traffic is to run PIM in your fabric.  You associate each VNI
+with a particular multicast group.  This is because when a segment needs
+to send a BUM packet, it must be delivered to all interested receivers.
 For this reason, the same VNI must be associated with the same group
 on all VTEPs.  Eventually, with enough VNIs, you may run into issues
 with scaling the number of multicast groups.  You will start mapping
@@ -161,7 +161,7 @@ members should be the unique IP address of the spine.
    the scale.
 
 
-.. _data-plane:
+.. _mcast-data-plane:
 
 Data Plane
 ----------
