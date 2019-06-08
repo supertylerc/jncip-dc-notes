@@ -409,6 +409,8 @@ Symmetric IRB may sometimes be described as
 performing a briding and routing operation and then the egress VTEP
 performing a routing and bridging operation.
 
+.. _edge-vs-central-irb:
+
 Edge vs. Central Routing and Bridging
 -------------------------------------
 
