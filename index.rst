@@ -85,6 +85,8 @@ the contributor requests otherwise.
    layer-2-fabrics
    layer-3-fabrics
    vxlan
+   vxlan-evpn
+   lab-objectives
    contributors
 
 * :ref:`search`

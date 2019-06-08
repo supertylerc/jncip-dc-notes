@@ -14,6 +14,7 @@ help:
 .PHONY: help Makefile
 
 html:
+	rm -rf _build/*
 	@$(SPHINXBUILD) -M html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 publish: html

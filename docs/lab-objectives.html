@@ -1,0 +1,205 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Technology-Oriented Labs &#8212; jncip-dc-notes  documentation</title>
+    <link rel="stylesheet" href="static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="static/documentation_options.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="static/underscore.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <script type="text/javascript" src="static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Contributors" href="contributors.html" />
+    <link rel="prev" title="EVPN VXLAN Signaling" href="vxlan-evpn.html" />
+   
+  <link rel="stylesheet" href="static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="technology-oriented-labs">
+<h1>Technology-Oriented Labs<a class="headerlink" href="#technology-oriented-labs" title="Permalink to this headline">¶</a></h1>
+<p>TODO: Flesh this out more.  A lot more.</p>
+<p>Right now, this page is a sort of scratch pad on things that are likely
+to be on the exam.  It’s lab-oriented, with some specific implementation
+details.</p>
+<div class="section" id="lab-1-multicast-and-crb-with-qfx">
+<h2>Lab 1 (Multicast and CRB with QFX)<a class="headerlink" href="#lab-1-multicast-and-crb-with-qfx" title="Permalink to this headline">¶</a></h2>
+<p>This lab should focus on multicast for BUM replication and VTEP
+discovery.  It should implement VxLAN routing at the spine layer.  The
+spines should be QFX10k Series devices.</p>
+</div>
+<div class="section" id="lab-2-multicast-and-crb-with-mx">
+<h2>Lab 2 (Multicast and CRB with MX)<a class="headerlink" href="#lab-2-multicast-and-crb-with-mx" title="Permalink to this headline">¶</a></h2>
+<p>This lab should focus on multicast for BUM replication and VTEP
+discovery.  It should implement VxLAN routing at the spine layer.  The
+spines should be MX Series devices.</p>
+</div>
+<div class="section" id="lab-3-multicast-and-erb">
+<h2>Lab 3 (Multicast and ERB)<a class="headerlink" href="#lab-3-multicast-and-erb" title="Permalink to this headline">¶</a></h2>
+<p>This lab should focus on multicast for BUM replication and VTEP
+discovery.  It should implement VxLAN routing at the leaf layer.  Use
+either the QFX10k or QFX5110 Series for the leaf layer.</p>
+</div>
+<div class="section" id="lab-4-evpn-and-crb-with-qfx">
+<h2>Lab 4 (EVPN and CRB with QFX)<a class="headerlink" href="#lab-4-evpn-and-crb-with-qfx" title="Permalink to this headline">¶</a></h2>
+<p>This lab should focus on BGP EVPN and ingress replication for VTEP
+discovery.  It should implement VxLAN routing at the spine layer.  The
+spines should be QFX10k Series devices.</p>
+</div>
+<div class="section" id="lab-5-evpn-and-crb-with-mx">
+<h2>Lab 5 (EVPN and CRB with MX)<a class="headerlink" href="#lab-5-evpn-and-crb-with-mx" title="Permalink to this headline">¶</a></h2>
+<p>This lab should focus on BGP EVPN and ingress replication for VTEP
+discovery.  It should implement VxLAN routing at the spine layer.  The
+spines should be MX Series devices.</p>
+</div>
+<div class="section" id="lab-6-evpn-and-erb">
+<h2>Lab 6 (EVPN and ERB)<a class="headerlink" href="#lab-6-evpn-and-erb" title="Permalink to this headline">¶</a></h2>
+<p>This lab should focus on BGP EVPN and ingress replication for VTEP
+discovery.  It should implement VxLAN routing at the leaf layer.  Use
+either the QFX10k or QFX5110 Series for the leaf layer.</p>
+</div>
+<div class="section" id="lab-7-evpn-multihoming-with-qfx">
+<h2>Lab 7 (EVPN Multihoming with QFX)<a class="headerlink" href="#lab-7-evpn-multihoming-with-qfx" title="Permalink to this headline">¶</a></h2>
+<p>This lab should focus on EVPN using a QFX at the leaf layer.  Use any of
+labs 3 through 6 as the base topology and add EVPN Multihoming at the
+leaf layer with a QFX Series device.</p>
+</div>
+<div class="section" id="lab-8-evpn-multihoming-with-mx">
+<h2>Lab 8 (EVPN Multihoming with MX)<a class="headerlink" href="#lab-8-evpn-multihoming-with-mx" title="Permalink to this headline">¶</a></h2>
+<p>This lab should focus on EVPN using an MX at the leaf layer.  Use any of
+labs 3 through 6 as the base topology and add EVPN Multihoming at the
+leaf layer with an MX Series device.</p>
+</div>
+<div class="section" id="lab-9-dci-with-mx-series-evpn-stitching">
+<h2>Lab 9 (DCI with MX Series EVPN Stitching)<a class="headerlink" href="#lab-9-dci-with-mx-series-evpn-stitching" title="Permalink to this headline">¶</a></h2>
+<p>Implement a DCI solution with lab 7 or 8 as a starting point and MX
+Series devices as WAN routers.  They should stitch a VxLAN EVPN to an
+MPLS EVPN solution.</p>
+</div>
+<div class="section" id="lab-10-dci-with-mx-series-l3vpn">
+<h2>Lab 10 (DCI with MX Series L3VPN)<a class="headerlink" href="#lab-10-dci-with-mx-series-l3vpn" title="Permalink to this headline">¶</a></h2>
+<p>Implement a DCI solution with lab7 or 8 as a starting point and MX
+Series devices as WAN routers.  The VxLAN EVPN solution should simply
+ride over a normal MPLS L3VPN.</p>
+</div>
+<div class="section" id="lab-11-dci-with-vxlan-evpn-and-mx">
+<h2>Lab 11 (DCI with VxLAN EVPN and MX)<a class="headerlink" href="#lab-11-dci-with-vxlan-evpn-and-mx" title="Permalink to this headline">¶</a></h2>
+<p>Implement a DCI solution with lab7 or 8 as a starting point and MX
+Series devices as spines.  The solution should be implemented using only
+VxLAN BGP EVPN.</p>
+</div>
+<div class="section" id="lab-11-dci-with-vxlan-evpn-and-qfx">
+<h2>Lab 11 (DCI with VxLAN EVPN and QFX)<a class="headerlink" href="#lab-11-dci-with-vxlan-evpn-and-qfx" title="Permalink to this headline">¶</a></h2>
+<p>Implement a DCI solution with lab7 or 8 as a starting point and QFX10k
+Series devices as spines.  The solution should be implemented using only
+VxLAN BGP EVPN.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">jncip-dc-notes</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="dc-deployment-and-management.html">Data Center Deployment and Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mc-lag.html">Multi-Chassis LAG (MC-LAG)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="layer-2-fabrics.html">Layer 2 Fabrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="layer-3-fabrics.html">Layer 3 Fabrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vxlan.html">VXLAN</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vxlan-evpn.html">EVPN VXLAN Signaling</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Technology-Oriented Labs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#lab-1-multicast-and-crb-with-qfx">Lab 1 (Multicast and CRB with QFX)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lab-2-multicast-and-crb-with-mx">Lab 2 (Multicast and CRB with MX)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lab-3-multicast-and-erb">Lab 3 (Multicast and ERB)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lab-4-evpn-and-crb-with-qfx">Lab 4 (EVPN and CRB with QFX)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lab-5-evpn-and-crb-with-mx">Lab 5 (EVPN and CRB with MX)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lab-6-evpn-and-erb">Lab 6 (EVPN and ERB)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lab-7-evpn-multihoming-with-qfx">Lab 7 (EVPN Multihoming with QFX)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lab-8-evpn-multihoming-with-mx">Lab 8 (EVPN Multihoming with MX)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lab-9-dci-with-mx-series-evpn-stitching">Lab 9 (DCI with MX Series EVPN Stitching)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lab-10-dci-with-mx-series-l3vpn">Lab 10 (DCI with MX Series L3VPN)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lab-11-dci-with-vxlan-evpn-and-mx">Lab 11 (DCI with VxLAN EVPN and MX)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lab-11-dci-with-vxlan-evpn-and-qfx">Lab 11 (DCI with VxLAN EVPN and QFX)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributors.html">Contributors</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="vxlan-evpn.html" title="previous chapter">EVPN VXLAN Signaling</a></li>
+      <li>Next: <a href="contributors.html" title="next chapter">Contributors</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Tyler Christiansen.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/lab-objectives.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

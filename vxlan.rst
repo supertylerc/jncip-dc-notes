@@ -23,8 +23,9 @@ might (or might not) fall, the following sections are written to
 describe platform-dependent concepts:
 
 * :ref:`vxlan-gateways`
-* :ref:`asymmetric-vs-symmetric-irb`
 * :ref:`hardware-positioning`
+* :ref:`asymmetric-vs-symmetric-irb`
+* :ref:`edge-vs-central-irb`
 
 
 .. _introduction-to-vxlan:
@@ -273,14 +274,30 @@ an SPT (``(S,G)`` state).
 VxLAN L2 and L3 Gateways
 ------------------------
 
-Coming Soon!
+VxLAN has two types of gateways: Layer 2 and Layer 3.
 
-.. _asymmetric-vs-symmetric-irb:
+VxLAN Layer 2 Gateway
+^^^^^^^^^^^^^^^^^^^^^
 
-Asymmetric vs Syemmtric IRB
----------------------------
+A Layer 2 Gateway is what bridges a VLAN to a VNI (or vice versa).  It
+is the stitching point for converting a legacy layer 2 network (a VLAN)
+to an overlay layer 2 network (a VxLAN VNI).
 
-Coming Soon!
+
+VxLAN Layer 3 Gateway
+^^^^^^^^^^^^^^^^^^^^^
+
+A VxLAN Layer 3 Gateway routes traffic between two VNIs.  In a Juniper
+network, the VxLAN Layer 3 Gateway is frequently a QFX10k or MX Series
+device running at the spine layer; in this architecture, your spine
+switches must also be VTEPs.  This presents a complexity and scaling
+issue.  The :ref:`hardware-positioning` section below discusses where
+to place specific Juniper hardware in the network.
+
+.. note::
+   VxLAN Layer 3 Gateway is sometimes simply referred to as VxLAN
+   routing.  In other materials, you may see it referred to as RIOT
+   (Routing In and Out of Tunnels).
 
 .. _hardware-positioning:
 
@@ -333,6 +350,109 @@ Ultimately, most of these platforms have some limitations to consider
 chipsets for Layer 2 VxLAN and other chipsets for Layer 3 VxLAN
 services or to use newer chipsets for every tier.
 
+.. _asymmetric-vs-symmetric-irb:
+
+Asymmetric vs Symmetric IRB
+---------------------------
+
+.. note::
+   Juniper's original implementation used the :ref:`asymmetric-irb`
+   model.  With the QFX10k and MX Series, they have implemented
+   :ref:`symmetric-irb`.  See :ref:`hardware-positioning` for
+   additional hardware-specific details.
+
+.. _asymmetric-irb:
+
+Asymmetric IRB
+^^^^^^^^^^^^^^
+
+Asymmetric IRB performs bridging and routing on the ingress VTEP, but
+only briding on the egress VTEP.  When a host wants to send a packet to
+a host in a different broadcast domain, it sends the packet with the
+destination MAC set to that of its default gateway as normal.  When the
+ingress VTEP receives the frame, it performs a route lookup and
+encapsulates the frame in a VxLAN header, setting the VNI to that of the
+egress VNI.  When the egress VTEP receives the VxLAN packet, it
+decapsulates it and bridges it directly onto the destination VLAN (known
+by the VLAN-to-VNI mapping).  This happens in the opposite direction as
+well.  The end result is that the VNI used when transporting a frame
+between two layer 2 domains will always be the egress VNI.
+
+This model suffers a significant scalability penalty because it must
+have all VNIs configured even if there is not a host in that segment
+attached to the switch.  This is because the ingress node must know
+about the egress VNI on the egress VTEP.  However, its configuration
+is simpler, and depending on the hardware platform, :ref:`symmetric-irb`
+might incur a performance penalty due to requiring one additional lookup
+on the egress VTEP compared to the Asymmetric IRB model.
+
+Asymmetric IRB may sometimes be described as ``bridge-route-bridge``.
+This refers to the lookups performed when moving traffic between two
+layer 2 segments.  The ingress VTEP performs a bridging and routing
+operation, while the egress VTEP only performs a bridging operation.
+
+.. _symmetric-irb:
+
+Symmetric IRB
+^^^^^^^^^^^^^
+
+With Symmetric IRB, there is a dedicated Layer 3 VNI that is used for
+all layer 3 routing between any two layer 2 VNIs for the same tenant.
+This results in more configuration for the devices, and it also requires
+an additional hardware lookup when compared to :ref:`asymmetric-irb`,
+but it is more scalable because it does not require the egress VNI to be
+configured on an ingress VTEP if there is not a host attached to that
+VNI locally.
+
+Symmetric IRB may sometimes be described as
+``bridge-route-route-bridge``.  This refers to the ingress VTEP
+performing a briding and routing operation and then the egress VTEP
+performing a routing and bridging operation.
+
+Edge vs. Central Routing and Bridging
+-------------------------------------
+
+In VxLAN, there are two mechanisms for routing traffic: edge and
+central.  These terms refer to how traffic in an overlay is routed.  In
+both cases, the IP and MAC address must be the same for active/active
+forwarding; however, with :ref:`crb`, you can use active/standby gateway
+solutions such as VRRP.
+
+.. _crb:
+
+Central Routing and Bridging
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Central Routing and Bridging refers to doing VxLAN routing on a central
+set of devices, such as the spines or a pair of special border leafs.
+There can be a scalability and complexity issue if this model is
+implemented on spines as it means that all spines must also be VTEPs and
+must support advanced VxLAN features.  Bandwidth utilization is also a
+concern because if a tenant has multiple VNIs, even if the VMs are
+located on the same leaf switch, they must both go up to the spine
+switch in order to talk to each other.  When implementing on a dedicated
+pair of border leafs, bandwidth utilization becomes an even larger
+consideration as traffic must go up to the spines, down to the border
+leafs, and back again.  This type of design is reminiscent of some of
+the classic traffic tromboning and hairpinning issues.
+
+.. note::
+   While this is probably good for a vendor, it may not be great for an
+   operator.  It increases operational complexity and the cost of the
+   solution.  It may also be a significant waste of bandwidth.
+
+CRB may be the correct design if you need very high ACL scale or when
+advanced services (load balancing, NAT, firewalls, etc.) are not native
+to your VxLAN overlay.
+
+Edge Routing and Bridging
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Edge Routing and Bridging may sometimes be called Anycast Gateway or
+Distributed Gateway.  In this model, each leaf performs VxLAN routing.
+In order to minimize potential disruption, it is imperative that all
+VTEPs use the same IP address and MAC address for the IRB interface for
+a given Layer 3 Gateway.
 
 .. _configuration:
 

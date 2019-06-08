@@ -14,7 +14,7 @@
     <script type="text/javascript" src="static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Contributors" href="contributors.html" />
+    <link rel="next" title="EVPN VXLAN Signaling" href="vxlan-evpn.html" />
     <link rel="prev" title="Layer 3 Fabrics" href="layer-3-fabrics.html" />
    
   <link rel="stylesheet" href="static/custom.css" type="text/css" />
@@ -56,8 +56,9 @@ might (or might not) fall, the following sections are written to
 describe platform-dependent concepts:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#vxlan-gateways"><span class="std std-ref">VxLAN L2 and L3 Gateways</span></a></p></li>
-<li><p><a class="reference internal" href="#asymmetric-vs-symmetric-irb"><span class="std std-ref">Asymmetric vs Syemmtric IRB</span></a></p></li>
 <li><p><a class="reference internal" href="#hardware-positioning"><span class="std std-ref">Hardware Positioning</span></a></p></li>
+<li><p><a class="reference internal" href="#asymmetric-vs-symmetric-irb"><span class="std std-ref">Asymmetric vs Symmetric IRB</span></a></p></li>
+<li><p><span class="xref std std-ref">edge-vs-central-irb</span></p></li>
 </ul>
 <div class="section" id="introduction-to-vxlan">
 <span id="id1"></span><h2>Introduction to VXLAN<a class="headerlink" href="#introduction-to-vxlan" title="Permalink to this headline">¶</a></h2>
@@ -271,11 +272,28 @@ an exhaustive multicast reference or even a primer.</p>
 </div>
 <div class="section" id="vxlan-l2-and-l3-gateways">
 <span id="vxlan-gateways"></span><h2>VxLAN L2 and L3 Gateways<a class="headerlink" href="#vxlan-l2-and-l3-gateways" title="Permalink to this headline">¶</a></h2>
-<p>Coming Soon!</p>
+<p>VxLAN has two types of gateways: Layer 2 and Layer 3.</p>
+<div class="section" id="vxlan-layer-2-gateway">
+<h3>VxLAN Layer 2 Gateway<a class="headerlink" href="#vxlan-layer-2-gateway" title="Permalink to this headline">¶</a></h3>
+<p>A Layer 2 Gateway is what bridges a VLAN to a VNI (or vice versa).  It
+is the stitching point for converting a legacy layer 2 network (a VLAN)
+to an overlay layer 2 network (a VxLAN VNI).</p>
 </div>
-<div class="section" id="asymmetric-vs-syemmtric-irb">
-<span id="asymmetric-vs-symmetric-irb"></span><h2>Asymmetric vs Syemmtric IRB<a class="headerlink" href="#asymmetric-vs-syemmtric-irb" title="Permalink to this headline">¶</a></h2>
-<p>Coming Soon!</p>
+<div class="section" id="vxlan-layer-3-gateway">
+<h3>VxLAN Layer 3 Gateway<a class="headerlink" href="#vxlan-layer-3-gateway" title="Permalink to this headline">¶</a></h3>
+<p>A VxLAN Layer 3 Gateway routes traffic between two VNIs.  In a Juniper
+network, the VxLAN Layer 3 Gateway is frequently a QFX10k or MX Series
+device running at the spine layer; in this architecture, your spine
+switches must also be VTEPs.  This presents a complexity and scaling
+issue.  The <a class="reference internal" href="#hardware-positioning"><span class="std std-ref">Hardware Positioning</span></a> section below discusses where
+to place specific Juniper hardware in the network.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>VxLAN Layer 3 Gateway is sometimes simply referred to as VxLAN
+routing.  In other materials, you may see it referred to as RIOT
+(Routing In and Out of Tunnels).</p>
+</div>
+</div>
 </div>
 <div class="section" id="hardware-positioning">
 <span id="id6"></span><h2>Hardware Positioning<a class="headerlink" href="#hardware-positioning" title="Permalink to this headline">¶</a></h2>
@@ -323,8 +341,97 @@ Layer 3 gateway services.</p>
 chipsets for Layer 2 VxLAN and other chipsets for Layer 3 VxLAN
 services or to use newer chipsets for every tier.</p>
 </div>
+<div class="section" id="asymmetric-vs-symmetric-irb">
+<span id="id8"></span><h2>Asymmetric vs Symmetric IRB<a class="headerlink" href="#asymmetric-vs-symmetric-irb" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Juniper’s original implementation used the <a class="reference internal" href="#asymmetric-irb"><span class="std std-ref">Asymmetric IRB</span></a>
+model.  With the QFX10k and MX Series, they have implemented
+<a class="reference internal" href="#symmetric-irb"><span class="std std-ref">Symmetric IRB</span></a>.  See <a class="reference internal" href="#hardware-positioning"><span class="std std-ref">Hardware Positioning</span></a> for
+additional hardware-specific details.</p>
+</div>
+<div class="section" id="asymmetric-irb">
+<span id="id9"></span><h3>Asymmetric IRB<a class="headerlink" href="#asymmetric-irb" title="Permalink to this headline">¶</a></h3>
+<p>Asymmetric IRB performs bridging and routing on the ingress VTEP, but
+only briding on the egress VTEP.  When a host wants to send a packet to
+a host in a different broadcast domain, it sends the packet with the
+destination MAC set to that of its default gateway as normal.  When the
+ingress VTEP receives the frame, it performs a route lookup and
+encapsulates the frame in a VxLAN header, setting the VNI to that of the
+egress VNI.  When the egress VTEP receives the VxLAN packet, it
+decapsulates it and bridges it directly onto the destination VLAN (known
+by the VLAN-to-VNI mapping).  This happens in the opposite direction as
+well.  The end result is that the VNI used when transporting a frame
+between two layer 2 domains will always be the egress VNI.</p>
+<p>This model suffers a significant scalability penalty because it must
+have all VNIs configured even if there is not a host in that segment
+attached to the switch.  This is because the ingress node must know
+about the egress VNI on the egress VTEP.  However, its configuration
+is simpler, and depending on the hardware platform, <a class="reference internal" href="#symmetric-irb"><span class="std std-ref">Symmetric IRB</span></a>
+might incur a performance penalty due to requiring one additional lookup
+on the egress VTEP compared to the Asymmetric IRB model.</p>
+<p>Asymmetric IRB may sometimes be described as <code class="docutils literal notranslate"><span class="pre">bridge-route-bridge</span></code>.
+This refers to the lookups performed when moving traffic between two
+layer 2 segments.  The ingress VTEP performs a bridging and routing
+operation, while the egress VTEP only performs a bridging operation.</p>
+</div>
+<div class="section" id="symmetric-irb">
+<span id="id10"></span><h3>Symmetric IRB<a class="headerlink" href="#symmetric-irb" title="Permalink to this headline">¶</a></h3>
+<p>With Symmetric IRB, there is a dedicated Layer 3 VNI that is used for
+all layer 3 routing between any two layer 2 VNIs for the same tenant.
+This results in more configuration for the devices, and it also requires
+an additional hardware lookup when compared to <a class="reference internal" href="#asymmetric-irb"><span class="std std-ref">Asymmetric IRB</span></a>,
+but it is more scalable because it does not require the egress VNI to be
+configured on an ingress VTEP if there is not a host attached to that
+VNI locally.</p>
+<p>Symmetric IRB may sometimes be described as
+<code class="docutils literal notranslate"><span class="pre">bridge-route-route-bridge</span></code>.  This refers to the ingress VTEP
+performing a briding and routing operation and then the egress VTEP
+performing a routing and bridging operation.</p>
+</div>
+</div>
+<div class="section" id="edge-vs-central-routing-and-bridging">
+<h2>Edge vs. Central Routing and Bridging<a class="headerlink" href="#edge-vs-central-routing-and-bridging" title="Permalink to this headline">¶</a></h2>
+<p>In VxLAN, there are two mechanisms for routing traffic: edge and
+central.  These terms refer to how traffic in an overlay is routed.  In
+both cases, the IP and MAC address must be the same for active/active
+forwarding; however, with <a class="reference internal" href="#crb"><span class="std std-ref">Central Routing and Bridging</span></a>, you can use active/standby gateway
+solutions such as VRRP.</p>
+<div class="section" id="central-routing-and-bridging">
+<span id="crb"></span><h3>Central Routing and Bridging<a class="headerlink" href="#central-routing-and-bridging" title="Permalink to this headline">¶</a></h3>
+<p>Central Routing and Bridging refers to doing VxLAN routing on a central
+set of devices, such as the spines or a pair of special border leafs.
+There can be a scalability and complexity issue if this model is
+implemented on spines as it means that all spines must also be VTEPs and
+must support advanced VxLAN features.  Bandwidth utilization is also a
+concern because if a tenant has multiple VNIs, even if the VMs are
+located on the same leaf switch, they must both go up to the spine
+switch in order to talk to each other.  When implementing on a dedicated
+pair of border leafs, bandwidth utilization becomes an even larger
+consideration as traffic must go up to the spines, down to the border
+leafs, and back again.  This type of design is reminiscent of some of
+the classic traffic tromboning and hairpinning issues.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>While this is probably good for a vendor, it may not be great for an
+operator.  It increases operational complexity and the cost of the
+solution.  It may also be a significant waste of bandwidth.</p>
+</div>
+<p>CRB may be the correct design if you need very high ACL scale or when
+advanced services (load balancing, NAT, firewalls, etc.) are not native
+to your VxLAN overlay.</p>
+</div>
+<div class="section" id="edge-routing-and-bridging">
+<h3>Edge Routing and Bridging<a class="headerlink" href="#edge-routing-and-bridging" title="Permalink to this headline">¶</a></h3>
+<p>Edge Routing and Bridging may sometimes be called Anycast Gateway or
+Distributed Gateway.  In this model, each leaf performs VxLAN routing.
+In order to minimize potential disruption, it is imperative that all
+VTEPs use the same IP address and MAC address for the IRB interface for
+a given Layer 3 Gateway.</p>
+</div>
+</div>
 <div class="section" id="configuration">
-<span id="id8"></span><h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<span id="id11"></span><h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
 <p>TODO: Add configuration examples for a VXLAN multicast control plane
 using OSPF as the IGP and <a class="reference internal" href="#anycast-rp"><span class="std std-ref">Anycast RP</span></a>.</p>
 <p class="rubric">Footnotes</p>
@@ -391,12 +498,27 @@ using OSPF as the IGP and <a class="reference internal" href="#anycast-rp"><span
 <li class="toctree-l3"><a class="reference internal" href="#multicast-data-plane-for-bum-traffic">Multicast Data Plane for BUM Traffic</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#vxlan-l2-and-l3-gateways">VxLAN L2 and L3 Gateways</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#asymmetric-vs-syemmtric-irb">Asymmetric vs Syemmtric IRB</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#vxlan-l2-and-l3-gateways">VxLAN L2 and L3 Gateways</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#vxlan-layer-2-gateway">VxLAN Layer 2 Gateway</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#vxlan-layer-3-gateway">VxLAN Layer 3 Gateway</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#hardware-positioning">Hardware Positioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#asymmetric-vs-symmetric-irb">Asymmetric vs Symmetric IRB</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#asymmetric-irb">Asymmetric IRB</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#symmetric-irb">Symmetric IRB</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#edge-vs-central-routing-and-bridging">Edge vs. Central Routing and Bridging</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#central-routing-and-bridging">Central Routing and Bridging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edge-routing-and-bridging">Edge Routing and Bridging</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="vxlan-evpn.html">EVPN VXLAN Signaling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lab-objectives.html">Technology-Oriented Labs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributors.html">Contributors</a></li>
 </ul>
 
@@ -405,7 +527,7 @@ using OSPF as the IGP and <a class="reference internal" href="#anycast-rp"><span
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="layer-3-fabrics.html" title="previous chapter">Layer 3 Fabrics</a></li>
-      <li>Next: <a href="contributors.html" title="next chapter">Contributors</a></li>
+      <li>Next: <a href="vxlan-evpn.html" title="next chapter">EVPN VXLAN Signaling</a></li>
   </ul></li>
 </ul>
 </div>
