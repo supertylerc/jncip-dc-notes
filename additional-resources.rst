@@ -25,7 +25,7 @@ Finally, there is an older Juniper Day One book on `Deploying Zero Touch Provisi
 It's focused on the EX and SRX Series, but it should still serve as a
 useful reference.
 
-.. _mc-lag-resrouce:
+.. _mc-lag-resource:
 
 Multichassis LAG
 ----------------
