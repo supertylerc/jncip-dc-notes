@@ -466,9 +466,6 @@ using OSPF as the IGP and :ref:`anycast-rp`.
 
 .. rubric:: Footnotes
 
-.. [#f1] `Juniper QFX5100 Series <https://www.amazon.com/Juniper-QFX5100-Comprehensive-Building-Next-Generation/dp/1491949570/>`_
-.. [#f2] `RFC7938: Use of BGP in Large-Scale Data Centers, Section 5.2: EBGP Configuration for Clos Topology <https://tools.ietf.org/html/rfc7938#section-5.2>`_
-.. [#f3] `BGP in the Data Center, Chapter 2, ASN Numbering Model <https://learning.oreilly.com/library/view/bgp-in-the/9781491983416/>`_
 .. [#f4] `Junos Feature Explorer - Bidirectional PIM <https://apps.juniper.net/feature-explorer/feature-info.html?fKey=3786&fn=Bidirectional%20PIM>`_
 .. [#f5] `JNCIP-DC Syllabus <https://www.juniper.net/us/en/training/certification/certification-tracks/data-center-track?tab=jncip-dc>`_
 .. [#f6] `VXLAN Constraints on QFX Series and EX Series Switches <https://www.juniper.net/documentation/en_US/junos/topics/concept/vxlan-constraints-qfx-series.html>`_

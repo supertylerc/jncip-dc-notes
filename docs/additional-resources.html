@@ -1,0 +1,356 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Additional Resources &#8212; jncip-dc-notes  documentation</title>
+    <link rel="stylesheet" href="static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="static/documentation_options.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="static/underscore.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <script type="text/javascript" src="static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Contributors" href="contributors.html" />
+    <link rel="prev" title="Technology-Oriented Labs" href="lab-objectives.html" />
+   
+  <link rel="stylesheet" href="static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="additional-resources">
+<h1>Additional Resources<a class="headerlink" href="#additional-resources" title="Permalink to this headline">¶</a></h1>
+<p>Although I’ve tried to provide references on each page, they can become
+lost pretty easily.  For that reason, this page includes references for
+books, feature guides, solutions guides, videos, and blogs that might be
+helpful when studying for the JNCIP-DC exam.</p>
+<div class="section" id="data-center-deployment-or-management">
+<h2>Data Center Deployment or Management<a class="headerlink" href="#data-center-deployment-or-management" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference external" href="https://www.amazon.com/Juniper-QFX5100-Comprehensive-Building-Next-Generation/dp/1491949570/">QFX5100 Series</a>
+book from O’Reilly is a great resources for this section of the
+blueprint.  Check chapters 6 (Network Automation) and 9 (Network
+Analytics) specifically.</p>
+<p>A good blog post for ZTP is <a class="reference external" href="https://nextheader.net/2015/09/02/zero-touch-provisioning-on-juniper-devices-using-linux/">this one from NextHeader</a>.
+It includes a topology diagram, switch outputs, configuration of an ISC
+DHCP Server on Ubuntu, and pcaps.</p>
+<p>As you’ll see throughout this list of resources, the blog over at
+<a class="reference external" href="https://jncie.tech/">https://jncie.tech/</a> has a blog on ZTP: <a class="reference external" href="https://jncie.tech/2017/07/07/zero-touch-provisioning/">JNCIE TECH - Zero Touch Provisioning</a>.</p>
+<p>Finally, there is an older Juniper Day One book on <a class="reference external" href="https://www.amazon.com/Day-One-Deploying-Touch-Provisioning-ebook/dp/B0195KUGV8">Deploying Zero Touch Provisioning</a>.
+It’s focused on the EX and SRX Series, but it should still serve as a
+useful reference.</p>
+</div>
+<div class="section" id="multichassis-lag">
+<span id="mc-lag-resrouce"></span><h2>Multichassis LAG<a class="headerlink" href="#multichassis-lag" title="Permalink to this headline">¶</a></h2>
+<p>For MC-LAG, check out the <a class="reference external" href="https://www.amazon.com/Juniper-MX-Comprehensive-Guide-Technologies/dp/1491932724/">MX Series</a>
+book from O’Reilly.  Chapter 9 is all about Multi-Chassis Link Aggregation.</p>
+<p>This will cover you on the MX side, but there’s still MC-LAG on the QFX
+to worry about.  It’s very similar, so it shouldn’t be too difficult.
+Another great resource is the official <a class="reference external" href="https://www.juniper.net/documentation/en_US/junos/information-products/pathway-pages/mc-lag/multichassis-link-aggregation-groups.html">Multichassis Link Aggregation Feature Guide</a>.</p>
+<p>The following list of blogs can be useful, too:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://jncie.tech/2017/07/10/mc-lag/">JNCIE TECH - MC-LAG Overview</a></p></li>
+<li><p><a class="reference external" href="https://jncie.tech/2017/07/29/mc-lag-lab-basic-l2-connectivity/">JNCIE TECH - MC-LAG Lab - Basic L2 Connectivity</a></p></li>
+<li><p><a class="reference external" href="https://jncie.tech/2017/07/30/mc-lag-lab-advanced-irb-functionality/">JNCIE TECH - MC-LAG Lab - Advanced IRB Functionality</a></p></li>
+<li><p><a class="reference external" href="https://jncie.eu/mc-lag-on-vqfx-eve-ng/">Christians Juniper Blog - MC-LAG on vQFX (EVE-NG)</a></p></li>
+</ul>
+</div>
+<div class="section" id="layer-2-fabrics">
+<h2>Layer 2 Fabrics<a class="headerlink" href="#layer-2-fabrics" title="Permalink to this headline">¶</a></h2>
+<p>For Virtual Chassis, a great resource is <a class="reference external" href="https://www.juniper.net/documentation/en_US/junos/topics/concept/virtual-chassis-ex-qfx-series-mixed-understanding.html">Understanding Mixed EX Series and QFX Series Virtual Chassis</a>.
+This will help you understand some limitations of mixed mode Virtual
+Chassis with EX and QFX Series switches.  For configuration, check
+<a class="reference external" href="https://www.juniper.net/documentation/en_US/junos/topics/task/configuration/virtual-chassis-qfx-series-cli.html">Configuring a QFX Virtual Chassis</a>.
+For a more general Virtual Chassis read, check out the <a class="reference external" href="https://www.amazon.com/JUNOS-Enterprise-Switching-Practical-Certification/dp/059615397X/">Junos Enterprise Switching</a>
+book, specifically Chapter 4, EX Virtual Chassis.  Finally, the <a class="reference external" href="https://www.juniper.net/us/en/training/jnbooks/day-one/fabric-switching-tech-series/ex-series-up-running/">Day One: EX Series Up and Running</a>
+book has two chapters on Virtual Chassis - Chapters 4 and 5.</p>
+<p>For Virtual Chassis Fabric, you can read the <a class="reference external" href="https://www.amazon.com/Juniper-QFX5100-Comprehensive-Building-Next-Generation/dp/1491949570/">QFX5100 Series</a>
+book.  Chapter 5 is dedicated to Virtual Chassis Fabric.  Another good
+reference is the <a class="reference external" href="https://www.juniper.net/us/en/training/jnbooks/day-one/fundamentals-series/data-center/">Day One: Data Center Fundamentals</a>
+book.  Chapter 5 covers fabric architectures, including
+<span class="xref std std-ref">mc-lag-resource</span>, Virtual Chassis, and Virtual Chassi Fabric.
+Finally, the <a class="reference external" href="https://www.juniper.net/documentation/en_US/junos/information-products/pathway-pages/qfx-series/virtual-chassis-fabric.html">Virtual Chassis Fabric Feature Guide</a>
+is a great resource for all things Virtual Chassis Fabric.  For a dive
+into best practices, check the <a class="reference external" href="https://www.juniper.net/documentation/en_US/release-independent/vcf/information-products/pathway-pages/vcf-best-practices-guide.pdf">Best Practices: Virtual Chassis Best Practices Guide</a>.</p>
+<p>For blogs, <a class="reference external" href="https://jncie.tech">https://jncie.tech</a> comes in again with <a class="reference external" href="https://jncie.tech/2017/07/08/vcf/">JNCIE TECH - VCF</a>.</p>
+</div>
+<div class="section" id="layer-3-fabrics">
+<h2>Layer 3 Fabrics<a class="headerlink" href="#layer-3-fabrics" title="Permalink to this headline">¶</a></h2>
+<p>This one is a potentially large topic, and there are a number of
+resources for it, including white papers, RFCs, and books.</p>
+<p>First, there is the <a class="reference external" href="https://www.juniper.net/us/en/local/pdf/whitepapers/2000565-en.pdf">Clos IP Fabrics with QFX5100 Switches</a>
+white paper.  This is all about the layer 3 underlay with a strong focus
+on BGP.  Both eBGP and iBGP (with route reflectors) are covered.</p>
+<p>Next, in terms of books, there is the <a class="reference external" href="https://www.amazon.com/Juniper-QFX5100-Comprehensive-Building-Next-Generation/dp/1491949570/">QFX5100 Series</a>
+book.  Chapter 7 is all about IP fabrics, although its content seems to
+be largely the same as the afore-mentioned white paper.  Another good
+reference is Chapter 6 of the <a class="reference external" href="https://www.juniper.net/us/en/training/jnbooks/day-one/fundamentals-series/data-center/">Day One: Data Center Fundamentals</a>
+book.  This chapter is, again, completely dedicated to Layer 3 fabrics.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For a much more in-depth treatise on BGP in the Data Center, see the
+<a class="reference external" href="https://learning.oreilly.com/library/view/bgp-in-the/9781491983416/">book of the same name</a>.
+This book focuses on Free-Range Routing (FRR, the routing software
+used in Cumulus), but 100% of the theory applies here.</p>
+</div>
+<p>Finally, there is informational <a class="reference external" href="https://tools.ietf.org/html/rfc7938">RFC 7938, Use of BGP for Routing in Large-Scale Data Centers</a>.</p>
+<p>If blogs are more your speed, the only one I’ve found that seems
+appropriately scoped for this topic only is <a class="reference external" href="https://jncie.tech/2017/07/11/ip-fabric/">JNCIE TECH - IP Fabric</a>.
+<a class="reference external" href="http://www.networkers.fi/blog/juniper-qfx-ip-fabric-and-vxlan-part-1/">Juniper QFX, IP-Fabric and VXLAN – Part</a>
+may be helpful as well, but it also includes some multicast
+configuration, which I generally lump in with VxLAN.</p>
+</div>
+<div class="section" id="vxlan">
+<h2>VxLAN<a class="headerlink" href="#vxlan" title="Permalink to this headline">¶</a></h2>
+<p>This is a massive topic.  The list of resources here will intentionally
+ignore EVPN as that is listed as a separate topic in the syllabus.</p>
+<p>For books, the <a class="reference external" href="https://www.amazon.com/Juniper-QFX5100-Comprehensive-Building-Next-Generation/dp/1491949570/">QFX5100 Series</a>
+is again a great resource.  Chapter 8 covers Overlay Networking.  <a class="reference external" href="https://www.juniper.net/us/en/training/jnbooks/day-one/fundamentals-series/data-center/">Day One: Data Center Fundamentals</a>
+covers VxLAN in Chapter 7, Overlay Networking.</p>
+<p>For blogs, we have a few to choose from:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.networkers.fi/blog/juniper-qfx-ip-fabric-and-vxlan-part-1/">Juniper QFX, IP-Fabric and VXLAN – Part 1</a></p></li>
+<li><p><a class="reference external" href="http://www.networkers.fi/blog/juniper-qfx-ip-fabric-and-vxlan-part-2/">Juniper QFX, IP-Fabric and VXLAN – Part 2</a></p></li>
+<li><p><a class="reference external" href="https://jncie.tech/2017/07/15/vxlan-multicast/">JNCIE TECH - VXLAN Multicast</a></p></li>
+</ul>
+<p>These next two are from Cumulus, but they should still help explain
+gateway placement options:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://cumulusnetworks.com/blog/vxlan-designs-part-1/">VXLAN Designs: 3 Ways to Consider Routing and Gateway Design (Part 1)</a></p></li>
+<li><p><a class="reference external" href="https://cumulusnetworks.com/blog/vxlan-designs-part-2/">VXLAN Designs: 3 Ways to Consider Routing and Gateway Design (Part 2)</a></p></li>
+</ul>
+<p>The next set are specific to Cisco, but if you’re familiar with NX-OS,
+you might find them helpful.  They’re also good for general theory.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://nwktimes.blogspot.com/2018/02/vxlan-part-i-why-vxlan-is-needed.html">The Network Times - VXLAN Part I: Why do we need VXLAN?</a></p></li>
+<li><p><a class="reference external" href="https://nwktimes.blogspot.com/2018/03/vxlan-part-iv-underlay-network.html">The Network Times - VXLAN Part III: The Underlay Network – Multidestination Traffic: Anycast-RP with PIM</a></p></li>
+<li><p><a class="reference external" href="https://nwktimes.blogspot.com/2018/03/vxlan-part-v-flood-and-learn.html">The Network Times - VXLAN Part V: Flood and Learn</a></p></li>
+</ul>
+<p>If videos are your speed, here are a list of YouTube resources:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.youtube.com/watch?v=Jqm_4TMmQz8">Introduction to Cloud Overlay Networks - VxLAN</a> by <a class="reference external" href="https://twitter.com/davidmahler">David Mahler</a></p></li>
+<li><p><a class="reference external" href="https://www.youtube.com/watch?v=YNqKDI_bnPM&amp;list=PLDQaRcbiSnqFe6pyaSy-Hwj8XRFPgZ5h8">VxLAN Playlist</a> by <a class="reference external" href="https://www.youtube.com/channel/UCtuXekfqj-paqsxtqVNCC2A">Network Direction</a></p></li>
+<li><p><a class="reference external" href="https://www.youtube.com/watch?v=qujBqnSQHVQ">VxLAN 101</a> by <a class="reference external" href="https://twitter.com/ioshints">Ivan Pepelnjak</a></p></li>
+</ul>
+</div>
+<div class="section" id="evpn-vxlan-signaling">
+<h2>EVPN VxLAN Signaling<a class="headerlink" href="#evpn-vxlan-signaling" title="Permalink to this headline">¶</a></h2>
+<p>For books, we start with the <a class="reference external" href="https://www.juniper.net/us/en/training/jnbooks/day-one/fundamentals-series/data-center/">Day One: Data Center Fundamentals</a>
+book, which covers EVPN in Chapter 9.  From there, we can look to the
+<a class="reference external" href="https://www.amazon.com/Juniper-QFX10000-Comprehensive-Building-Next-Generation-ebook/dp/B01J6MYF58/">QFX10000 Series</a>
+book.  Chapter 6 covers Ethernet VPN.  We also have the <a class="reference external" href="https://www.juniper.net/us/en/training/jnbooks/day-one/data-center-technologies/data-center-deployment-evpn-vxlan/">This Week: Data Center Deployment EVPN/VXLAN</a>
+book.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference external" href="https://learning.oreilly.com/library/view/evpn-in-the/9781492029045/">EVPN in the Data Center</a>
+is a great book for learning about EVPN.  Its primary focus is FRR,
+but all of the theory and concepts apply to Junos as well.</p>
+</div>
+<p>The following guides will also be useful:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.juniper.net/documentation/en_US/release-independent/solutions/information-products/pathway-pages/sg-003-evpn-vxlan.html">Solution Guide: Infrastructure as a Service: EVPN and VXLAN</a></p></li>
+<li><p><a class="reference external" href="https://www.juniper.net/documentation/en_US/junos/information-products/pathway-pages/junos-sdn/evpn-vxlan.html">EVPN Feature Guide</a></p></li>
+<li><p><a class="reference external" href="https://www.juniper.net/documentation/en_US/release-independent/solutions/information-products/pathway-pages/sg-005-cloud-data-center.html">Cloud Data Center Architecture Guide</a></p></li>
+<li><p><a class="reference external" href="https://www.juniper.net/documentation/en_US/release-independent/solutions/information-products/pathway-pages/evpn-lag-multihoming-guide/evpn-lag-multihoming-guide.html">EVPN LAG Multihoming in EVPN-VXLAN Cloud Data Center Infrastructures</a></p></li>
+</ul>
+<p>For blog posts, we again have a large number of posts to dive into:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://jncie.eu/evpn-vxlan-on-vqfx-series-devices/">Christians Juniper Blog - EVPN-VXLAN on (v)QFX-Series Devices</a></p></li>
+<li><p><a class="reference external" href="https://danhearty.wordpress.com/2018/02/22/juniper-qfx10k-evpn-vxlan-mac-learning-verification-single-homed-endpoint/">Dan Hearty - Juniper QFX10K | EVPN-VXLAN | MAC Learning Verification | Single-Homed Endpoint</a></p></li>
+<li><p><a class="reference external" href="https://danhearty.wordpress.com/2018/03/28/juniper-qfx10k-evpn-vxlan-evpn-anycast-gateway-verification/">Dan Hearty - Juniper QFX10K | EVPN-VXLAN | EVPN Anycast Gateway Verification</a></p></li>
+<li><p><a class="reference external" href="https://danhearty.wordpress.com/2019/05/04/juniper-qfx10k-evpn-vxlan-irb-routing-bgp/">Dan Hearty - Juniper QFX10k | EVPN-VXLAN | IRB Routing | BGP</a></p></li>
+<li><p><a class="reference external" href="https://jncie.tech/2017/08/01/evpn-vxlan-lab-basic-l2-switching/">JNCIE TECH - EVPN-VXLAN Lab - Basic L2 Switching</a></p></li>
+<li><p><a class="reference external" href="https://jncie.tech/2017/08/03/evpn-vxlan-lab-rt-assignment-methods/">JNCIE TECH - EVPN-VXLAN Lab - RT Assignment Methods</a></p></li>
+<li><p><a class="reference external" href="https://jncie.tech/2017/08/05/evpn-vxlan-lab-irb-functionality/">JNCIE TECH - EVPN-VXLAN Lab - IRB Functionality</a></p></li>
+<li><p><a class="reference external" href="https://jncie.tech/2017/07/18/mx-evpn-vxlan-basic-config/">JNCIE TECH - MX EVPN-VXLAN Basic Config</a></p></li>
+<li><p><a class="reference external" href="https://jncie.tech/2017/07/19/qfx-evpn-basic-config/">JNCIE TECH - QFX EVPN Basic Config</a></p></li>
+<li><p><a class="reference external" href="https://jncie.tech/2017/07/20/evpn-vxlan-rt-communities/">JNCIE TECH - EVPN-VXLAN RT Communities</a></p></li>
+<li><p><a class="reference external" href="https://blog.noc.grnet.gr/2016/09/28/lab-on-evpn-vxlan-on-juniper-qfx5100-switches-3/">Lab on EVPN – VXLAN on QFX5100 Switches</a></p></li>
+<li><p><a class="reference external" href="https://cumulusnetworks.com/blog/asymmetric-vs-symmetric-model/">VXLAN Routing with EVPN: Asymmetric vs. Symmetric Model</a>
+(this is a Cumulus post, but it’s still very helpful)</p></li>
+</ul>
+<p>Next, some Cisco Nexus-centric blog posts:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://nwktimes.blogspot.com/2018/04/vxlan-part-vi-vxlan-bgp-evpn-basic.html">The Network Times - VXLAN Part VI: VXLAN BGP EVPN – Basic Configurations</a></p></li>
+<li><p><a class="reference external" href="https://nwktimes.blogspot.com/2018/05/vxlan-part-vii-vxlan-bgp-evpn-control.html">The Network Times - VXLAN Part VII: VXLAN BGP EVPN – Control Plane Operation</a></p></li>
+<li><p><a class="reference external" href="https://nwktimes.blogspot.com/2018/06/vxlan-part-viii-vxlan-bgp-evpn-external.html">The Network Times - VXLAN Part VIII: VXLAN BGP EVPN – External Connection</a></p></li>
+<li><p><a class="reference external" href="https://nwktimes.blogspot.com/2018/09/vxlan-part-xii-routing-exchange.html">The Network Times - VXLAN Part XII: Routing Exchange – Intra/Inter-L2VNI, EVPN-to-IP, EVPN-to-VPNv4</a></p></li>
+<li><p><a class="reference external" href="https://nwktimes.blogspot.com/2018/11/vxlan-part-xiv-control-plane-operation.html">The Network Times - VXLAN Part XIV: Control Plane Operation in BGP EVPN VXLAN Fabric</a></p></li>
+<li><p><a class="reference external" href="https://nwktimes.blogspot.com/2018/12/vxlan-part-xv-analysis-of-bgp-evpn.html">The Network Times - VXLAN Part XV: Analysis of the BGP EVPN Control Plane Operation</a></p></li>
+</ul>
+<p>Some videos from YouTube that might help:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.youtube.com/watch?v=EBjPve8AmR4">Juniper Networks EVPN - VXLAN Architecture</a>
+from Tech Field Day</p></li>
+<li><p><a class="reference external" href="https://www.youtube.com/watch?v=I1gPiWACgUo">Building Blocks in EVPN for Multi-Service Fabrics</a>
+from NANOG 75</p></li>
+</ul>
+</div>
+<div class="section" id="data-center-interconnect">
+<h2>Data Center Interconnect<a class="headerlink" href="#data-center-interconnect" title="Permalink to this headline">¶</a></h2>
+<p>DCI is a pretty big topic with quite a few ways to implement.  Most of
+the materials I’ve seen so far seem to focus on straight VxLAN EVPN
+connectivity.  However, there’s at least one blog post from JNCIE TECH
+(listed below) that covers EVPN stitching.</p>
+<p>Books that may be useful:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.juniper.net/us/en/training/jnbooks/day-one/proof-concept-labs/using-ethernet-vpns/">Day One: Using Ethernet VPNs for Data Center Interconnect</a></p></li>
+<li><p><a class="reference external" href="https://www.juniper.net/us/en/training/jnbooks/day-one/mpls-up-running-on-junos/">Day One: MPLS Up and Running</a></p></li>
+<li><p><a class="reference external" href="https://www.juniper.net/us/en/training/jnbooks/day-one/networking-technologies-series/mpls-enterprise-engineers/">Day One: MPLS for Enterprise Engineers</a></p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Two of the books above are on MPLS basics.  For better or worse, it
+looks like a portion of this track relies on MPLS.  I’ve added the
+two references references above in case you are coming directly from
+the Enterprise track, which is a prerequisite for the DC track but
+has no MPLS coverage.</p>
+</div>
+<p>Blog posts:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://jncie.tech/2017/07/17/mx-evpn-mpls-basic-config/">JNCIE TECH - MX EVPN-MPLS Basic Config</a></p></li>
+<li><p><a class="reference external" href="https://jncie.tech/2017/07/21/mx-evpn-irb-functionality/">JNCIE TECH - MX EVPN IRB Functionality</a></p></li>
+<li><p><a class="reference external" href="https://jncie.tech/2017/07/23/evpn-vxlan-to-evpn-mpls-stitching/">JNCIE TECH - EVPN-VXLAN to EVPN-MPLS Stitching</a></p></li>
+</ul>
+<p>Videos from YouTube:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.youtube.com/watch?v=nPKLe0M5yJU">BGP EVPN in Datacenter and Layer 3 Data Center Interconnect</a>
+from NANOG 66 (This is Cisco, but theory should mostly apply)</p></li>
+</ul>
+</div>
+<div class="section" id="data-center-architecture-and-security">
+<h2>Data Center Architecture and Security<a class="headerlink" href="#data-center-architecture-and-security" title="Permalink to this headline">¶</a></h2>
+<p>This seems to be a pretty nebulous topic.  The only items in the
+syllabus that are listed seem security-related, so I’m just going to
+focus on that.  First, a list of Day One books:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.juniper.net/us/en/training/jnbooks/day-one/fundamentals-series/configuring-junos-policies/">Day One: Configuring Junos Policies and Firewall Filters</a></p></li>
+<li><p><a class="reference external" href="https://www.juniper.net/us/en/training/jnbooks/day-one/fundamentals-series/hardening-junos-devices-checklist/">This Week: Hardening Junos Devices, 2nd Edition</a></p></li>
+<li><p><a class="reference external" href="https://www.juniper.net/us/en/training/jnbooks/day-one/deploying-bgp-routing-security/">Day One: Deploying BGP Routing Security</a></p></li>
+</ul>
+<p>Next, the <a class="reference external" href="https://www.amazon.com/Juniper-MX-Comprehensive-Guide-Technologies/dp/1491932724/">MX Series</a>
+book has an entire chapter dedicated to Routing Engine Protection and
+DDoS Prevention (Chapter 4).</p>
+<p>Finally, a couple of blog posts:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.inetzero.com/qfxmxevpn/">iNetZero - EVPN-VXLAN Inter-tenant Routing on Juniper QFX/MX</a></p></li>
+<li><p><a class="reference external" href="https://danhearty.wordpress.com/2018/07/09/using-junos-firewall-filters-for-troubleshooting-verification-qfx5110/">Dan Hearty - Using JUNOS Firewall Filters for Troubleshooting &amp; Verification | QFX5110</a></p></li>
+</ul>
+</div>
+<div class="section" id="miscellaneous">
+<h2>Miscellaneous<a class="headerlink" href="#miscellaneous" title="Permalink to this headline">¶</a></h2>
+<p>Some topics that are probably important but don’t seem to be called out
+explicitly in the syllabus:</p>
+<ul class="simple">
+<li><p>Oversubscription: <a class="reference external" href="https://www.juniper.net/us/en/training/jnbooks/day-one/fundamentals-series/data-center/">Day One: Data Center Fundamentals</a>
+has this covered in Chapter 4, while <a class="reference external" href="https://www.amazon.com/Juniper-QFX5100-Comprehensive-Building-Next-Generation/dp/1491949570/">QFX5100 Series</a>
+covers it in Chapter 3, Performance and Scaling.</p></li>
+<li><p>Virtual Machine Traffic Optimization (VMTO): <a class="reference external" href="https://www.juniper.net/documentation/en_US/release-independent/solutions/information-products/pathway-pages/solutions/l3gw-vmto-evpn-vxlan-mpls.pdf">Comparing Layer 3 Gateway &amp; Virtual Machine Traffic Optimization (VMTO) for EVPN/VXLAN and EVPN/MPLS</a>.
+I’m honestly not sure where this fits in, but it’s listed under
+<code class="docutils literal notranslate"><span class="pre">Additional</span> <span class="pre">Resources</span></code> on the <a class="reference external" href="https://www.juniper.net/us/en/training/certification/certification-tracks/data-center-track/?tab=jncip-dc">JNCIP-DC Certification Page</a>.</p></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">jncip-dc-notes</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="dc-deployment-and-management.html">Data Center Deployment and Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mc-lag.html">Multi-Chassis LAG (MC-LAG)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="layer-2-fabrics.html">Layer 2 Fabrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="layer-3-fabrics.html">Layer 3 Fabrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vxlan.html">VXLAN</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vxlan-evpn.html">EVPN VXLAN Signaling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lab-objectives.html">Technology-Oriented Labs</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Additional Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#data-center-deployment-or-management">Data Center Deployment or Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#multichassis-lag">Multichassis LAG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#layer-2-fabrics">Layer 2 Fabrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#layer-3-fabrics">Layer 3 Fabrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#vxlan">VxLAN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#evpn-vxlan-signaling">EVPN VxLAN Signaling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data-center-interconnect">Data Center Interconnect</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data-center-architecture-and-security">Data Center Architecture and Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#miscellaneous">Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributors.html">Contributors</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="lab-objectives.html" title="previous chapter">Technology-Oriented Labs</a></li>
+      <li>Next: <a href="contributors.html" title="next chapter">Contributors</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Tyler Christiansen.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/additional-resources.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

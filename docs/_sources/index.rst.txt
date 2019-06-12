@@ -87,6 +87,7 @@ the contributor requests otherwise.
    vxlan
    vxlan-evpn
    lab-objectives
+   additional-resources
    contributors
 
 * :ref:`search`

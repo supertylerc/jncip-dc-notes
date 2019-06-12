@@ -147,7 +147,7 @@ configured on spines, not leafs.  There are many options for configuring
 RP selection, such as static, bootstrap RP, or auto RP.  For the sake of
 simplicity, when combined with <a class="reference internal" href="#anycast-rp"><span class="std std-ref">Anycast RP</span></a>, a static configuration
 is likely the easiest option.</p>
-<p>Note that the QFX does not support PIM BiDir <a class="footnote-reference brackets" href="#f4" id="id3">4</a>.</p>
+<p>Note that the QFX does not support PIM BiDir <a class="footnote-reference brackets" href="#f4" id="id3">1</a>.</p>
 </div>
 <div class="section" id="anycast-rp">
 <span id="id4"></span><h3>Anycast RP<a class="headerlink" href="#anycast-rp" title="Permalink to this headline">¶</a></h3>
@@ -262,7 +262,7 @@ VTEP.  At this point, the tree switches from an RPT (<code class="docutils liter
 an SPT (<code class="docutils literal notranslate"><span class="pre">(S,G)</span></code> state).</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Multicast isn’t heavily called out in the JNCIP-DC syllabus <a class="footnote-reference brackets" href="#f5" id="id5">5</a>,
+<p>Multicast isn’t heavily called out in the JNCIP-DC syllabus <a class="footnote-reference brackets" href="#f5" id="id5">2</a>,
 so I expect it to be covered very lightly.  There seems to be a
 heavier focus in both documentation and the syllabus on
 <a class="reference internal" href="vxlan-evpn.html#vxlan-evpn"><span class="std std-ref">EVPN VXLAN Signaling</span></a>.  For this reason, these notes do not attempt to be
@@ -337,7 +337,7 @@ VxLAN Layer 3 gateway function.  The MX Series uses Trio, which is a
 custom chipset that is incredibly flexible and can perform the VxLAN
 Layer 3 gateway services.</p>
 <p>Ultimately, most of these platforms have some limitations to consider
-<a class="footnote-reference brackets" href="#f6" id="id7">6</a>.  A general rule of thumb is to use the Trident 2 and Tomahawk
+<a class="footnote-reference brackets" href="#f6" id="id7">3</a>.  A general rule of thumb is to use the Trident 2 and Tomahawk
 chipsets for Layer 2 VxLAN and other chipsets for Layer 3 VxLAN
 services or to use newer chipsets for every tier.</p>
 </div>
@@ -436,22 +436,13 @@ a given Layer 3 Gateway.</p>
 using OSPF as the IGP and <a class="reference internal" href="#anycast-rp"><span class="std std-ref">Anycast RP</span></a>.</p>
 <p class="rubric">Footnotes</p>
 <dl class="footnote brackets">
-<dt class="label" id="f1"><span class="brackets">1</span></dt>
-<dd><p><a class="reference external" href="https://www.amazon.com/Juniper-QFX5100-Comprehensive-Building-Next-Generation/dp/1491949570/">Juniper QFX5100 Series</a></p>
-</dd>
-<dt class="label" id="f2"><span class="brackets">2</span></dt>
-<dd><p><a class="reference external" href="https://tools.ietf.org/html/rfc7938#section-5.2">RFC7938: Use of BGP in Large-Scale Data Centers, Section 5.2: EBGP Configuration for Clos Topology</a></p>
-</dd>
-<dt class="label" id="f3"><span class="brackets">3</span></dt>
-<dd><p><a class="reference external" href="https://learning.oreilly.com/library/view/bgp-in-the/9781491983416/">BGP in the Data Center, Chapter 2, ASN Numbering Model</a></p>
-</dd>
-<dt class="label" id="f4"><span class="brackets"><a class="fn-backref" href="#id3">4</a></span></dt>
+<dt class="label" id="f4"><span class="brackets"><a class="fn-backref" href="#id3">1</a></span></dt>
 <dd><p><a class="reference external" href="https://apps.juniper.net/feature-explorer/feature-info.html?fKey=3786&amp;fn=Bidirectional%20PIM">Junos Feature Explorer - Bidirectional PIM</a></p>
 </dd>
-<dt class="label" id="f5"><span class="brackets"><a class="fn-backref" href="#id5">5</a></span></dt>
+<dt class="label" id="f5"><span class="brackets"><a class="fn-backref" href="#id5">2</a></span></dt>
 <dd><p><a class="reference external" href="https://www.juniper.net/us/en/training/certification/certification-tracks/data-center-track?tab=jncip-dc">JNCIP-DC Syllabus</a></p>
 </dd>
-<dt class="label" id="f6"><span class="brackets"><a class="fn-backref" href="#id7">6</a></span></dt>
+<dt class="label" id="f6"><span class="brackets"><a class="fn-backref" href="#id7">3</a></span></dt>
 <dd><p><a class="reference external" href="https://www.juniper.net/documentation/en_US/junos/topics/concept/vxlan-constraints-qfx-series.html">VXLAN Constraints on QFX Series and EX Series Switches</a></p>
 </dd>
 </dl>
@@ -519,6 +510,7 @@ using OSPF as the IGP and <a class="reference internal" href="#anycast-rp"><span
 </li>
 <li class="toctree-l1"><a class="reference internal" href="vxlan-evpn.html">EVPN VXLAN Signaling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="lab-objectives.html">Technology-Oriented Labs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="additional-resources.html">Additional Resources</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributors.html">Contributors</a></li>
 </ul>
 
