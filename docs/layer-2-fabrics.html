@@ -1,9 +1,11 @@
 
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Layer 2 Fabrics &#8212; jncip-dc-notes  documentation</title>
     <link rel="stylesheet" href="static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
@@ -36,12 +38,12 @@
 <h1>Layer 2 Fabrics<a class="headerlink" href="#layer-2-fabrics" title="Permalink to this headline">¶</a></h1>
 <p>This blueprint item primarily covers the following topics:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#vc"><span class="std std-ref">Virtual Chassis</span></a></p></li>
-<li><p><a class="reference internal" href="#vcf"><span class="std std-ref">Virtual Chassis Fabric</span></a></p></li>
+<li><a class="reference internal" href="#vc"><span class="std std-ref">Virtual Chassis</span></a></li>
+<li><a class="reference internal" href="#vcf"><span class="std std-ref">Virtual Chassis Fabric</span></a></li>
 </ul>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Both <a class="reference internal" href="#vc"><span class="std std-ref">Virtual Chassis</span></a> and <a class="reference internal" href="#vcf"><span class="std std-ref">Virtual Chassis Fabric</span></a> are hardware-based architectures.
+<p class="first admonition-title">Note</p>
+<p class="last">Both <a class="reference internal" href="#vc"><span class="std std-ref">Virtual Chassis</span></a> and <a class="reference internal" href="#vcf"><span class="std std-ref">Virtual Chassis Fabric</span></a> are hardware-based architectures.
 Unfortunately, I do not have access to real hardware; all of my
 labbing is based on the vQFX0000.  This means that although there
 may be configurations presented, I don’t currently have a way of
@@ -63,8 +65,8 @@ when building a new stack, the
 <code class="docutils literal notranslate"><span class="pre">request</span> <span class="pre">virtual-chassis</span> <span class="pre">mode</span> <span class="pre">mixed</span> <span class="pre">all-members</span> <span class="pre">reboot</span></code> command can be
 used to set all members in the stack to mixed mode at the same time.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>When operating in a mixed mode Virtual Chassis, the scaling numbers
+<p class="first admonition-title">Note</p>
+<p class="last">When operating in a mixed mode Virtual Chassis, the scaling numbers
 are reduced to the lowest common denominator.  This severely limits
 the scalability of a deployment.  The lowest common denominator is
 the lowest scaling factor of the smallest possible PFE.  This means
@@ -75,10 +77,10 @@ maximum scale of an EX4300.</p>
 <p>The benefits of a mixed mode Virtual Chassis are the same as those of a
 regular Virtual Chassis:</p>
 <ul class="simple">
-<li><p>Redundant Routing Engines</p></li>
-<li><p>NSR and NSB</p></li>
-<li><p>One control plane for multiple data planes</p></li>
-<li><p>Potential elimination of xSTP</p></li>
+<li>Redundant Routing Engines</li>
+<li>NSR and NSB</li>
+<li>One control plane for multiple data planes</li>
+<li>Potential elimination of xSTP</li>
 </ul>
 <p>By default, the 40G QSFP+ ports on an EX4300 are enabled for Virtual
 Chassis; however, on the QFX5100, these ports are disabled for Virtual
@@ -121,13 +123,13 @@ with QFX3500, QFX3600, QFX5100, and EX4300 series switches.
 New switches added to a VCF are automatically discovered and brought
 online.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The node limit is unclear.  In Chapter 5 of the O’Reilly QFX5100
-Series book <a class="footnote-reference brackets" href="#f1" id="id1">1</a>, a passage indicates that the maximum number of
+<p class="first admonition-title">Note</p>
+<p class="last">The node limit is unclear.  In Chapter 5 of the O’Reilly QFX5100
+Series book <a class="footnote-reference" href="#f1" id="id1">[1]</a>, a passage indicates that the maximum number of
 switches is 32; however, recent Juniper documentation publications
-<a class="footnote-reference brackets" href="#f2" id="id2">2</a> indicate that the limit is 20.  Because the documentation is
+<a class="footnote-reference" href="#f2" id="id2">[2]</a> indicate that the limit is 20.  Because the documentation is
 more recent than the published book, even though there is no
-confirmed and published errata <a class="footnote-reference brackets" href="#f3" id="id3">3</a>, readers should assume a limit
+confirmed and published errata <a class="footnote-reference" href="#f3" id="id3">[3]</a>, readers should assume a limit
 of 20 nodes.</p>
 </div>
 <p>Like <a class="reference internal" href="#vc"><span class="std std-ref">Virtual Chassis</span></a>, VCF uses IS-IS between switches.  The links between
@@ -165,14 +167,14 @@ Virtual Chassis Ports are also automatically discovered and added.
 Configuring a VCF in this mode is the same as configuring a <a class="reference internal" href="#vc"><span class="std std-ref">Virtual Chassis</span></a>
 in pre-provisioned mode.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>If you do not want links between switches to be converted to VCPs
+<p class="first admonition-title">Note</p>
+<p class="last">If you do not want links between switches to be converted to VCPs
 automatically, delete the LLDP configuration before powering on
 additional switches.</p>
 </div>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>If you’re using a mixed mode <a class="reference internal" href="#vcf"><span class="std std-ref">Virtual Chassis Fabric</span></a>, you need to disable the
+<p class="first admonition-title">Note</p>
+<p class="last">If you’re using a mixed mode <a class="reference internal" href="#vcf"><span class="std std-ref">Virtual Chassis Fabric</span></a>, you need to disable the
 VCPs on any EX4300 switch in order for the VCPs to autonegotiate
 successfully.  Converting VCPs to network interfaces is covered
 in the <a class="reference internal" href="#data-plane"><span class="std std-ref">Data Plane</span></a> section.</p>
@@ -186,8 +188,8 @@ with <code class="docutils literal notranslate"><span class="pre">request</span>
 switch needs to be installed next, and it should be cabled to the second
 spine switch before bringing up the second spine switch.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>If you need a Mixed Mode <a class="reference internal" href="#vcf"><span class="std std-ref">Virtual Chassis Fabric</span></a>, such as when building a fabric
+<p class="first admonition-title">Note</p>
+<p class="last">If you need a Mixed Mode <a class="reference internal" href="#vcf"><span class="std std-ref">Virtual Chassis Fabric</span></a>, such as when building a fabric
 with the QFX5100 and EX4300, you need to use the
 <code class="docutils literal notranslate"><span class="pre">request</span> <span class="pre">virtual-chassis</span> <span class="pre">mode</span> <span class="pre">fabric</span> <span class="pre">mixed</span> <span class="pre">reboot</span></code> operational
 command.  When operating a mixed mode <a class="reference internal" href="#vcf"><span class="std std-ref">Virtual Chassis Fabric</span></a>, you can set the
@@ -212,8 +214,8 @@ following the same uptime rules.</p>
 4: QFX5100 with lowest MAC address</p>
 <p>For the backup RE, the process is repeated.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>You might notice that this the same mastership election process as
+<p class="first admonition-title">Note</p>
+<p class="last">You might notice that this the same mastership election process as
 for <a class="reference internal" href="#vc"><span class="std std-ref">Virtual Chassis</span></a>.</p>
 </div>
 </div>
@@ -266,23 +268,23 @@ ID, among other fields.</p>
 <p>For load balancing hashing, the following fields are used:</p>
 <p>Layer 2+Fabric Header:</p>
 <ul class="simple">
-<li><p>Source MAC</p></li>
-<li><p>Destination MAC</p></li>
-<li><p>Ethertype</p></li>
-<li><p>VLAN ID</p></li>
-<li><p>Incoming Port ID</p></li>
-<li><p>Incoming Member ID</p></li>
+<li>Source MAC</li>
+<li>Destination MAC</li>
+<li>Ethertype</li>
+<li>VLAN ID</li>
+<li>Incoming Port ID</li>
+<li>Incoming Member ID</li>
 </ul>
 <p>Layer 3+4:</p>
 <ul class="simple">
-<li><p>Source IP</p></li>
-<li><p>Destination IP</p></li>
-<li><p>Source Port</p></li>
-<li><p>Destination Port</p></li>
-<li><p>Protocol</p></li>
-<li><p>Incoming Port ID</p></li>
-<li><p>Incoming Member ID</p></li>
-<li><p>Next Header (IPv6 Only)</p></li>
+<li>Source IP</li>
+<li>Destination IP</li>
+<li>Source Port</li>
+<li>Destination Port</li>
+<li>Protocol</li>
+<li>Incoming Port ID</li>
+<li>Incoming Member ID</li>
+<li>Next Header (IPv6 Only)</li>
 </ul>
 <p>If you need to convert an interface to a VCP, the
 <code class="docutils literal notranslate"><span class="pre">request</span> <span class="pre">virtual-chassis</span> <span class="pre">vc-port</span> <span class="pre">set</span> <span class="pre">pic-slot</span> <span class="pre">&lt;id&gt;</span> <span class="pre">port</span> <span class="pre">&lt;id&gt;</span> <span class="pre">member</span> <span class="pre">&lt;id&gt;</span></code>
@@ -303,8 +305,8 @@ switches in the <a class="reference internal" href="#vcf"><span class="std std-r
 the available MDTs for sending BUM traffic.  This traffic is hashed
 based on the VLAN ID.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>In a <a class="reference internal" href="#vcf"><span class="std std-ref">Virtual Chassis Fabric</span></a>, all members receive a copy of all BUM traffic.</p>
+<p class="first admonition-title">Note</p>
+<p class="last">In a <a class="reference internal" href="#vcf"><span class="std std-ref">Virtual Chassis Fabric</span></a>, all members receive a copy of all BUM traffic.</p>
 </div>
 </div>
 <div class="section" id="fabric-partition">
@@ -314,37 +316,44 @@ one or more switches become isolated from one or more other switches in
 the fabric.  When this happens, one of the new fabrics will remain
 active, and the others will be deactivated.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>“Isolated” refers to communications via the Virtual Chassis Ports.
+<p class="first admonition-title">Note</p>
+<p class="last">“Isolated” refers to communications via the Virtual Chassis Ports.
 Even if IP connectivity would otherwise exist, the fabric is
 considered partitioned if it cannot communicate over the VCPs.</p>
 </div>
 <p>To determine which fabric will remain active, the following rules are
 evaluated, in order:</p>
-<dl class="simple">
-<dt>1: The fabric contains both the master and the backup RE from the</dt><dd><p>previous fabric</p>
-</dd>
-<dt>2: The fabric contains the original master RE and at least half of the</dt><dd><p>members from the previous fabric</p>
-</dd>
-<dt>2: The fabric contains the backup master RE and at least half of the</dt><dd><p>members from the previous fabric</p>
-</dd>
+<dl class="docutils">
+<dt>1: The fabric contains both the master and the backup RE from the</dt>
+<dd>previous fabric</dd>
+<dt>2: The fabric contains the original master RE and at least half of the</dt>
+<dd>members from the previous fabric</dd>
+<dt>2: The fabric contains the backup master RE and at least half of the</dt>
+<dd>members from the previous fabric</dd>
 </dl>
 <p>If your design can function when a partition happens, you can disable
 the default behavior with the <code class="docutils literal notranslate"><span class="pre">set</span> <span class="pre">virtual-chassis</span> <span class="pre">no-split-detection</span></code>
 configuration command.  This disables the deactivation of partitioned
 fabrics described above.</p>
 <p class="rubric">Footnotes</p>
-<dl class="footnote brackets">
-<dt class="label" id="f1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p><a class="reference external" href="https://www.amazon.com/Juniper-QFX5100-Comprehensive-Building-Next-Generation/dp/1491949570/">Juniper QFX5100 Series</a></p>
-</dd>
-<dt class="label" id="f2"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
-<dd><p><a class="reference external" href="https://www.juniper.net/documentation/en_US/release-independent/junos/topics/reference/requirements/virtual-chassis-fabric-hardware-planning.html">Planning a Virtual Chassis Fabric Deployment</a></p>
-</dd>
-<dt class="label" id="f3"><span class="brackets"><a class="fn-backref" href="#id3">3</a></span></dt>
-<dd><p><a class="reference external" href="https://www.oreilly.com/catalog/errata.csp?isbn=0636920033028">Errata for Juniper QFX5100 Series</a></p>
-</dd>
-</dl>
+<table class="docutils footnote" frame="void" id="f1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td><a class="reference external" href="https://www.amazon.com/Juniper-QFX5100-Comprehensive-Building-Next-Generation/dp/1491949570/">Juniper QFX5100 Series</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="f2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td><a class="reference external" href="https://www.juniper.net/documentation/en_US/release-independent/junos/topics/reference/requirements/virtual-chassis-fabric-hardware-planning.html">Planning a Virtual Chassis Fabric Deployment</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="f3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[3]</a></td><td><a class="reference external" href="https://www.oreilly.com/catalog/errata.csp?isbn=0636920033028">Errata for Juniper QFX5100 Series</a></td></tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
@@ -406,6 +415,8 @@ fabrics described above.</p>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
@@ -426,7 +437,7 @@ fabrics described above.</p>
       &copy;2019, Tyler Christiansen.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

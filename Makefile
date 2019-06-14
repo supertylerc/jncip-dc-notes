@@ -17,10 +17,14 @@ html:
 	rm -rf _build/*
 	@$(SPHINXBUILD) -M html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
-publish: html
+pdf:
+	@$(SPHINXBUILD) -M pdf "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+
+publish: html pdf
 	rm -rf docs/*
 	mv _build/html/* docs/
 	mv docs/_static docs/static
+	mv _build/pdf/* docs/
 	for i in `ls docs/*.html`; do sed -i -e 's/_static/static/g' $$i; done
 	for i in `ls docs/*.html`; do sed -i -e 's,static/jquery.js,https://code.jquery.com/jquery-3.4.1.min.js,g' $$i; done
 	echo "jncip-dc.tylerc.me" > docs/CNAME
