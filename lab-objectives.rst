@@ -84,7 +84,7 @@ Implement a DCI solution with lab7 or 8 as a starting point and MX
 Series devices as spines.  The solution should be implemented using only
 VxLAN BGP EVPN.
 
-Lab 11 (DCI with VxLAN EVPN and QFX)
+Lab 12 (DCI with VxLAN EVPN and QFX)
 ------------------------------------
 
 Implement a DCI solution with lab7 or 8 as a starting point and QFX10k
