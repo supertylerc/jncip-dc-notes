@@ -4,3 +4,6 @@ _templates/
 
 # Ignore vscode
 .vscode/
+
+# Ignore virtualenv
+.venv/

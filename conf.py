@@ -20,15 +20,14 @@
 project = 'jncip-dc-notes'
 copyright = '2019, Tyler Christiansen'
 author = 'Tyler Christiansen'
-
+description = 'JNCIP-DC Study Notes'
 
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = [
-]
+extensions = ['sphinx.ext.autodoc', 'rst2pdf.pdfbuilder']
 
 master_doc = 'index'
 
@@ -38,7 +37,9 @@ templates_path = ['_templates']
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '.venv']
+
+pdf_documents = [('index', project, description, author),]
 
 
 # -- Options for HTML output -------------------------------------------------
