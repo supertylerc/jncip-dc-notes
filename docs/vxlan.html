@@ -1,9 +1,11 @@
 
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>VXLAN &#8212; jncip-dc-notes  documentation</title>
     <link rel="stylesheet" href="static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
@@ -36,13 +38,13 @@
 <h1>VXLAN<a class="headerlink" href="#vxlan" title="Permalink to this headline">¶</a></h1>
 <p>This blueprint item primarily covers the following topics:</p>
 <ul class="simple">
-<li><p>L2VPN Control Planes</p></li>
-<li><p><a class="reference internal" href="#multicast-control-plane"><span class="std std-ref">Multicast Control Plane</span></a></p></li>
-<li><p><a class="reference internal" href="#mcast-data-plane"><span class="std std-ref">Data Plane</span></a></p></li>
+<li>L2VPN Control Planes</li>
+<li><a class="reference internal" href="#multicast-control-plane"><span class="std std-ref">Multicast Control Plane</span></a></li>
+<li><a class="reference internal" href="#mcast-data-plane"><span class="std std-ref">Data Plane</span></a></li>
 </ul>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Although the VXLAN section of the blueprint indicates L2VPN Control
+<p class="first admonition-title">Note</p>
+<p class="last">Although the VXLAN section of the blueprint indicates L2VPN Control
 Planes, they are not covered here; instead, they are covered on the
 <a class="reference internal" href="vxlan-evpn.html#vxlan-evpn"><span class="std std-ref">EVPN VXLAN Signaling</span></a> page.  I’m unaware of a different L2VPN control
 plane that uses VXLAN for encapsulation; perhaps the blueprint means
@@ -55,10 +57,10 @@ exists in the <a class="reference internal" href="#introduction-to-vxlan"><span 
 might (or might not) fall, the following sections are written to
 describe platform-dependent concepts:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#vxlan-gateways"><span class="std std-ref">VxLAN L2 and L3 Gateways</span></a></p></li>
-<li><p><a class="reference internal" href="#hardware-positioning"><span class="std std-ref">Hardware Positioning</span></a></p></li>
-<li><p><a class="reference internal" href="#asymmetric-vs-symmetric-irb"><span class="std std-ref">Asymmetric vs Symmetric IRB</span></a></p></li>
-<li><p><a class="reference internal" href="#edge-vs-central-irb"><span class="std std-ref">Edge vs. Central Routing and Bridging</span></a></p></li>
+<li><a class="reference internal" href="#vxlan-gateways"><span class="std std-ref">VxLAN L2 and L3 Gateways</span></a></li>
+<li><a class="reference internal" href="#hardware-positioning"><span class="std std-ref">Hardware Positioning</span></a></li>
+<li><a class="reference internal" href="#asymmetric-vs-symmetric-irb"><span class="std std-ref">Asymmetric vs Symmetric IRB</span></a></li>
+<li><a class="reference internal" href="#edge-vs-central-irb"><span class="std std-ref">Edge vs. Central Routing and Bridging</span></a></li>
 </ul>
 <div class="section" id="introduction-to-vxlan">
 <span id="id1"></span><h2>Introduction to VXLAN<a class="headerlink" href="#introduction-to-vxlan" title="Permalink to this headline">¶</a></h2>
@@ -99,8 +101,8 @@ the data center traditionally may not have MPLS functionality all the
 way to the server point of attachment, and MPLS features are frequently
 expensive, so a different way was devised.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Cost isn’t the only reason VXLAN was created.  Complexity is another;
+<p class="first admonition-title">Note</p>
+<p class="last">Cost isn’t the only reason VXLAN was created.  Complexity is another;
 MPLS requires additional protocols and requires that every device
 support it end-to-end; VXLAN does not.  With VXLAN, only the ingress
 and egress devices need to know how to deal with VXLAN; every other
@@ -147,7 +149,7 @@ configured on spines, not leafs.  There are many options for configuring
 RP selection, such as static, bootstrap RP, or auto RP.  For the sake of
 simplicity, when combined with <a class="reference internal" href="#anycast-rp"><span class="std std-ref">Anycast RP</span></a>, a static configuration
 is likely the easiest option.</p>
-<p>Note that the QFX does not support PIM BiDir <a class="footnote-reference brackets" href="#f4" id="id3">1</a>.</p>
+<p>Note that the QFX does not support PIM BiDir <a class="footnote-reference" href="#f4" id="id3">[1]</a>.</p>
 </div>
 <div class="section" id="anycast-rp">
 <span id="id4"></span><h3>Anycast RP<a class="headerlink" href="#anycast-rp" title="Permalink to this headline">¶</a></h3>
@@ -166,8 +168,8 @@ anycast shared IP under a different unit.</p>
 other Anycast RP members; the IP address used when defining the other
 members should be the unique IP address of the spine.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Instead of configuring an <code class="docutils literal notranslate"><span class="pre">rp-set</span></code> with each spine’s unique IP
+<p class="first admonition-title">Note</p>
+<p class="last">Instead of configuring an <code class="docutils literal notranslate"><span class="pre">rp-set</span></code> with each spine’s unique IP
 address, you can use MSDP.  However, that is out of scope for this
 guide as it seems unlikely (though not impossible) to appear on the
 exam.  For completeness, you should read the
@@ -204,8 +206,8 @@ decapsulated frames with a VLAN ID present is done at the
 <code class="docutils literal notranslate"><span class="pre">set</span> <span class="pre">vlans</span> <span class="pre">vlan273</span> <span class="pre">vxlan</span> <span class="pre">encapsulate-inner-vlan</span></code> and
 <code class="docutils literal notranslate"><span class="pre">set</span> <span class="pre">protocols</span> <span class="pre">l2-learning</span> <span class="pre">decapsulate-accept-inner-vlan</span></code>.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The option is the same between both the MX and the QFX, but where it
+<p class="first admonition-title">Note</p>
+<p class="last">The option is the same between both the MX and the QFX, but where it
 is applied is different.  The MX can perform these actions separately
 on multiple bridge domains, while the QFX applies them at a global
 level.</p>
@@ -219,21 +221,21 @@ device.  This encapsulation consists of a new VXLAN header, a new UDP
 header, a new IP header, and a new Ethernet header.  The information for
 each header is described in the list below.</p>
 <ul class="simple">
-<li><p>Ethernet Header: This is a normal Ethernet header; its source MAC will
+<li>Ethernet Header: This is a normal Ethernet header; its source MAC will
 be the SMAC of the egress switchport; the destination MAC will be the
-DMAC of the next hop IP address.</p></li>
-<li><p>IP Header: The source IP will be the local VTEP; the destination IP
+DMAC of the next hop IP address.</li>
+<li>IP Header: The source IP will be the local VTEP; the destination IP
 will be the remote VTEP that contains the remote host of the original
-IP packet.</p></li>
-<li><p>UDP Header: The source port is a random port based on a hashing
+IP packet.</li>
+<li>UDP Header: The source port is a random port based on a hashing
 algorithm of the original payload headers, and that hashing algorithm
 may depend on the specific hardware platform.  The destination port is
 usually the well-known (registered) VXLAN port of <code class="docutils literal notranslate"><span class="pre">4789</span></code>, though
 this can be changed on some implementations of VXLAN (especially those
-that are software-based, such as the Linux kernel or Open vSwitch).</p></li>
-<li><p>VXLAN Header: This is an 8 byte header that contains the VNI, a 24-bit
+that are software-based, such as the Linux kernel or Open vSwitch).</li>
+<li>VXLAN Header: This is an 8 byte header that contains the VNI, a 24-bit
 field.  8 bits are used for flags, and the other 32 bits are reserved
-for future use.</p></li>
+for future use.</li>
 </ul>
 <p>The ingress VTEP adds these headers, and the egress VTEP removes them.
 Any devices between the VTEPs treat the packet as a normal packet,
@@ -251,8 +253,8 @@ operations in the <a class="reference internal" href="#dp-known-unicast"><span c
 that the destination IP is not that of the destination VTEP but is
 instead that of the multicast group associated with the VNI.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>In addition to BUM traffic, the multicast topology is used to
+<p class="first admonition-title">Note</p>
+<p class="last">In addition to BUM traffic, the multicast topology is used to
 discover remote VTEPs.</p>
 </div>
 <p>When dealing with a software VTEP, an IGMP Join is translated into a PIM
@@ -261,8 +263,8 @@ RP.  The RP decapsulates the message and forwards it to the destination
 VTEP.  At this point, the tree switches from an RPT (<code class="docutils literal notranslate"><span class="pre">(*,G)</span></code> state) to
 an SPT (<code class="docutils literal notranslate"><span class="pre">(S,G)</span></code> state).</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Multicast isn’t heavily called out in the JNCIP-DC syllabus <a class="footnote-reference brackets" href="#f5" id="id5">2</a>,
+<p class="first admonition-title">Note</p>
+<p class="last">Multicast isn’t heavily called out in the JNCIP-DC syllabus <a class="footnote-reference" href="#f5" id="id5">[2]</a>,
 so I expect it to be covered very lightly.  There seems to be a
 heavier focus in both documentation and the syllabus on
 <a class="reference internal" href="vxlan-evpn.html#vxlan-evpn"><span class="std std-ref">EVPN VXLAN Signaling</span></a>.  For this reason, these notes do not attempt to be
@@ -288,8 +290,8 @@ switches must also be VTEPs.  This presents a complexity and scaling
 issue.  The <a class="reference internal" href="#hardware-positioning"><span class="std std-ref">Hardware Positioning</span></a> section below discusses where
 to place specific Juniper hardware in the network.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>VxLAN Layer 3 Gateway is sometimes simply referred to as VxLAN
+<p class="first admonition-title">Note</p>
+<p class="last">VxLAN Layer 3 Gateway is sometimes simply referred to as VxLAN
 routing.  In other materials, you may see it referred to as RIOT
 (Routing In and Out of Tunnels).</p>
 </div>
@@ -303,10 +305,10 @@ apart.  However, there is a simple rule of thumb:</p>
 <p>If you want your leaf/top-of-rack layer to provide VxLAN Layer 3 gateway
 services, do not use the following hardware platforms:</p>
 <ul class="simple">
-<li><p>EX4300 (Broadcom Trident 2)</p></li>
-<li><p>EX4600 (Broadcom Trident 2)</p></li>
-<li><p>QFX5100 (Broadcom Trident 2)</p></li>
-<li><p>QFX5200 (Broadcom Tomahawk)</p></li>
+<li>EX4300 (Broadcom Trident 2)</li>
+<li>EX4600 (Broadcom Trident 2)</li>
+<li>QFX5100 (Broadcom Trident 2)</li>
+<li>QFX5200 (Broadcom Tomahawk)</li>
 </ul>
 <p>This is because of the ASICs used.  These switches all use either the
 Broadcom Trident 2 or Tomahawk chipsets, which do not support the
@@ -319,16 +321,16 @@ your leaf/top-of-rack layer as they will allow you to perform VxLAN
 Layer 3 gateway services, thus reducing the traffic tromboning for
 inter-VxLAN routing in your data center fabric.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>There are ways around this with other vendors, but it is unclear if
+<p class="first admonition-title">Note</p>
+<p class="last">There are ways around this with other vendors, but it is unclear if
 Juniper supports these workarounds.</p>
 </div>
 <p>If you want VxLAN Layer 3 gateway services, the following platforms can
 be used:</p>
 <ul class="simple">
-<li><p>QFX5110 Series (Broadcom Trident 2+)</p></li>
-<li><p>QFX10000 Series (Juniper Q5)</p></li>
-<li><p>MX Series (Juniper Trio)</p></li>
+<li>QFX5110 Series (Broadcom Trident 2+)</li>
+<li>QFX10000 Series (Juniper Q5)</li>
+<li>MX Series (Juniper Trio)</li>
 </ul>
 <p>The QFX5110 is based on the Broadcom Trident 2+ and can perform VxLAN
 Layer 3 gateway services.  The QFX10000 Series switches run a custom
@@ -337,15 +339,15 @@ VxLAN Layer 3 gateway function.  The MX Series uses Trio, which is a
 custom chipset that is incredibly flexible and can perform the VxLAN
 Layer 3 gateway services.</p>
 <p>Ultimately, most of these platforms have some limitations to consider
-<a class="footnote-reference brackets" href="#f6" id="id7">3</a>.  A general rule of thumb is to use the Trident 2 and Tomahawk
+<a class="footnote-reference" href="#f6" id="id7">[3]</a>.  A general rule of thumb is to use the Trident 2 and Tomahawk
 chipsets for Layer 2 VxLAN and other chipsets for Layer 3 VxLAN
 services or to use newer chipsets for every tier.</p>
 </div>
 <div class="section" id="asymmetric-vs-symmetric-irb">
 <span id="id8"></span><h2>Asymmetric vs Symmetric IRB<a class="headerlink" href="#asymmetric-vs-symmetric-irb" title="Permalink to this headline">¶</a></h2>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Juniper’s original implementation used the <a class="reference internal" href="#asymmetric-irb"><span class="std std-ref">Asymmetric IRB</span></a>
+<p class="first admonition-title">Note</p>
+<p class="last">Juniper’s original implementation used the <a class="reference internal" href="#asymmetric-irb"><span class="std std-ref">Asymmetric IRB</span></a>
 model.  With the QFX10k and MX Series, they have implemented
 <a class="reference internal" href="#symmetric-irb"><span class="std std-ref">Symmetric IRB</span></a>.  See <a class="reference internal" href="#hardware-positioning"><span class="std std-ref">Hardware Positioning</span></a> for
 additional hardware-specific details.</p>
@@ -412,8 +414,8 @@ consideration as traffic must go up to the spines, down to the border
 leafs, and back again.  This type of design is reminiscent of some of
 the classic traffic tromboning and hairpinning issues.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>While this is probably good for a vendor, it may not be great for an
+<p class="first admonition-title">Note</p>
+<p class="last">While this is probably good for a vendor, it may not be great for an
 operator.  It increases operational complexity and the cost of the
 solution.  It may also be a significant waste of bandwidth.</p>
 </div>
@@ -435,17 +437,24 @@ a given Layer 3 Gateway.</p>
 <p>TODO: Add configuration examples for a VXLAN multicast control plane
 using OSPF as the IGP and <a class="reference internal" href="#anycast-rp"><span class="std std-ref">Anycast RP</span></a>.</p>
 <p class="rubric">Footnotes</p>
-<dl class="footnote brackets">
-<dt class="label" id="f4"><span class="brackets"><a class="fn-backref" href="#id3">1</a></span></dt>
-<dd><p><a class="reference external" href="https://apps.juniper.net/feature-explorer/feature-info.html?fKey=3786&amp;fn=Bidirectional%20PIM">Junos Feature Explorer - Bidirectional PIM</a></p>
-</dd>
-<dt class="label" id="f5"><span class="brackets"><a class="fn-backref" href="#id5">2</a></span></dt>
-<dd><p><a class="reference external" href="https://www.juniper.net/us/en/training/certification/certification-tracks/data-center-track?tab=jncip-dc">JNCIP-DC Syllabus</a></p>
-</dd>
-<dt class="label" id="f6"><span class="brackets"><a class="fn-backref" href="#id7">3</a></span></dt>
-<dd><p><a class="reference external" href="https://www.juniper.net/documentation/en_US/junos/topics/concept/vxlan-constraints-qfx-series.html">VXLAN Constraints on QFX Series and EX Series Switches</a></p>
-</dd>
-</dl>
+<table class="docutils footnote" frame="void" id="f4" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[1]</a></td><td><a class="reference external" href="https://apps.juniper.net/feature-explorer/feature-info.html?fKey=3786&amp;fn=Bidirectional%20PIM">Junos Feature Explorer - Bidirectional PIM</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="f5" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id5">[2]</a></td><td><a class="reference external" href="https://www.juniper.net/us/en/training/certification/certification-tracks/data-center-track?tab=jncip-dc">JNCIP-DC Syllabus</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="f6" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id7">[3]</a></td><td><a class="reference external" href="https://www.juniper.net/documentation/en_US/junos/topics/concept/vxlan-constraints-qfx-series.html">VXLAN Constraints on QFX Series and EX Series Switches</a></td></tr>
+</tbody>
+</table>
 </div>
 </div>
 
@@ -529,6 +538,8 @@ using OSPF as the IGP and <a class="reference internal" href="#anycast-rp"><span
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
@@ -549,7 +560,7 @@ using OSPF as the IGP and <a class="reference internal" href="#anycast-rp"><span
       &copy;2019, Tyler Christiansen.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

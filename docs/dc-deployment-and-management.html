@@ -1,9 +1,11 @@
 
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Data Center Deployment and Management &#8212; jncip-dc-notes  documentation</title>
     <link rel="stylesheet" href="static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
@@ -36,10 +38,10 @@
 <h1>Data Center Deployment and Management<a class="headerlink" href="#data-center-deployment-and-management" title="Permalink to this headline">¶</a></h1>
 <p>This blueprint item covers a number of topics:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#ztp"><span class="std std-ref">Zero-Touch Provisioning</span></a></p></li>
-<li><p><a class="reference internal" href="#ha"><span class="std std-ref">High Availability</span></a></p></li>
-<li><p><a class="reference internal" href="#monitoring"><span class="std std-ref">Monitoring</span></a></p></li>
-<li><p><a class="reference internal" href="#analytics"><span class="std std-ref">Analytics</span></a></p></li>
+<li><a class="reference internal" href="#ztp"><span class="std std-ref">Zero-Touch Provisioning</span></a></li>
+<li><a class="reference internal" href="#ha"><span class="std std-ref">High Availability</span></a></li>
+<li><a class="reference internal" href="#monitoring"><span class="std std-ref">Monitoring</span></a></li>
+<li><a class="reference internal" href="#analytics"><span class="std std-ref">Analytics</span></a></li>
 </ul>
 <p>Unfortunately, the blueprint doesn’t indicate to what level those items
 should be known, and all of those options seem to require physical
@@ -55,15 +57,15 @@ configuration can be retrieved.</p>
 <p>When configuring the DHCP server, the following DHCP options can be
 used:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">12</span></code>: Switch Hostname</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">42</span></code>: NTP Server</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">43.00</span></code>: Software image filename</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">43.01</span></code>: Configuration file filename</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">43.02</span></code>: Symbolic link flag for filename</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">43.03</span></code>: Transfer mode (HTTP, FTP, TFTP)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">43.04</span></code>: Alternate software image filename</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">66</span></code>: DNS FQDN for the HTTP/FTP/TFTP server</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">150</span></code>: IP Address for the HTTP/FTP/TFTP server</p></li>
+<li><code class="docutils literal notranslate"><span class="pre">12</span></code>: Switch Hostname</li>
+<li><code class="docutils literal notranslate"><span class="pre">42</span></code>: NTP Server</li>
+<li><code class="docutils literal notranslate"><span class="pre">43.00</span></code>: Software image filename</li>
+<li><code class="docutils literal notranslate"><span class="pre">43.01</span></code>: Configuration file filename</li>
+<li><code class="docutils literal notranslate"><span class="pre">43.02</span></code>: Symbolic link flag for filename</li>
+<li><code class="docutils literal notranslate"><span class="pre">43.03</span></code>: Transfer mode (HTTP, FTP, TFTP)</li>
+<li><code class="docutils literal notranslate"><span class="pre">43.04</span></code>: Alternate software image filename</li>
+<li><code class="docutils literal notranslate"><span class="pre">66</span></code>: DNS FQDN for the HTTP/FTP/TFTP server</li>
+<li><code class="docutils literal notranslate"><span class="pre">150</span></code>: IP Address for the HTTP/FTP/TFTP server</li>
 </ul>
 <p>The reason that both <code class="docutils literal notranslate"><span class="pre">44.00</span></code> and <code class="docutils literal notranslate"><span class="pre">44.04</span></code> can both be used is that
 some DHCP servers may not support <code class="docutils literal notranslate"><span class="pre">44.00</span></code>.  If both options are
@@ -93,10 +95,10 @@ future management.</p>
 <p>For more information on ZTP (including configuration examples), see the
 following blogs/articles:</p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://blog.digitalocean.com/zero-touch-provisioning-how-to-build-a-network-without-touching-anything/">Zero Touch Provisioning: How to Build a Network Without Touching Anything</a></p></li>
-<li><p><a class="reference external" href="https://nextheader.net/2015/09/02/zero-touch-provisioning-on-juniper-devices-using-linux/">Zero Touch Provisioning on Juniper devices using Linux</a></p></li>
+<li><a class="reference external" href="https://blog.digitalocean.com/zero-touch-provisioning-how-to-build-a-network-without-touching-anything/">Zero Touch Provisioning: How to Build a Network Without Touching Anything</a></li>
+<li><a class="reference external" href="https://nextheader.net/2015/09/02/zero-touch-provisioning-on-juniper-devices-using-linux/">Zero Touch Provisioning on Juniper devices using Linux</a></li>
 </ul>
-<p>You can also read Chapter 6 of the QFX5100 Series book from O’Reilly <a class="footnote-reference brackets" href="#f1" id="id1">1</a>.</p>
+<p>You can also read Chapter 6 of the QFX5100 Series book from O’Reilly <a class="footnote-reference" href="#f1" id="id1">[1]</a>.</p>
 </div>
 <div class="section" id="high-availability">
 <span id="ha"></span><h2>High Availability<a class="headerlink" href="#high-availability" title="Permalink to this headline">¶</a></h2>
@@ -111,7 +113,7 @@ interface, <code class="docutils literal notranslate"><span class="pre">em3</spa
 In-Service Software Upgrade, or TISSU.  The second Junos VM is only
 created during a TISSU.  In order to perform a TISSU, NSR, NSB, and GRES
 must be configured.</p>
-<p>The high-level process for TISSU is as follows <a class="footnote-reference brackets" href="#f2" id="id2">2</a>:</p>
+<p>The high-level process for TISSU is as follows <a class="footnote-reference" href="#f2" id="id2">[2]</a>:</p>
 <p>1: Create the backup Junos VM running the new version requested
 2: Synchronize state between the Junos VMs using <code class="docutils literal notranslate"><span class="pre">ksyncd</span></code>
 3: Makes the new VM the master RE
@@ -119,14 +121,14 @@ must be configured.</p>
 5: The former master Junos VM is shut down</p>
 <p>When performing a TISSU, keep the following in mind:</p>
 <ul class="simple">
-<li><p>Downgrades and rollbacks are not supported</p></li>
-<li><p>TISSU should not be used when transitioning between different base
-images (e.g., <code class="docutils literal notranslate"><span class="pre">standard</span></code> to <code class="docutils literal notranslate"><span class="pre">enhanced-automation</span></code>)</p></li>
-<li><p>The CLI is inaccessible during a TISSU</p></li>
-<li><p>Log files are located in <code class="docutils literal notranslate"><span class="pre">/var/log/vjunos-log.tgz</span></code></p></li>
-<li><p>BFD timers need to be &gt;= 1 second <a class="footnote-reference brackets" href="#f3" id="id3">3</a></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">system</span> <span class="pre">internet-options</span> <span class="pre">no-tcp-reset</span> <span class="pre">drop-all-tcp</span></code> must not be
-configured <a class="footnote-reference brackets" href="#f3" id="id4">3</a></p></li>
+<li>Downgrades and rollbacks are not supported</li>
+<li>TISSU should not be used when transitioning between different base
+images (e.g., <code class="docutils literal notranslate"><span class="pre">standard</span></code> to <code class="docutils literal notranslate"><span class="pre">enhanced-automation</span></code>)</li>
+<li>The CLI is inaccessible during a TISSU</li>
+<li>Log files are located in <code class="docutils literal notranslate"><span class="pre">/var/log/vjunos-log.tgz</span></code></li>
+<li>BFD timers need to be &gt;= 1 second <a class="footnote-reference" href="#f3" id="id3">[3]</a></li>
+<li><code class="docutils literal notranslate"><span class="pre">system</span> <span class="pre">internet-options</span> <span class="pre">no-tcp-reset</span> <span class="pre">drop-all-tcp</span></code> must not be
+configured <a class="footnote-reference" href="#f3" id="id4">[3]</a></li>
 </ul>
 <p>A configuration sample for enabling NSR, NSB, and GRES is below.</p>
 <div class="highlight-perl notranslate"><div class="highlight"><pre><span></span><span class="nb">system</span> <span class="p">{</span>
@@ -150,7 +152,7 @@ configured <a class="footnote-reference brackets" href="#f3" id="id4">3</a></p><
 <p>Once the configuration is in place, you can perform a TISSU with the
 <code class="docutils literal notranslate"><span class="pre">request</span> <span class="pre">system</span> <span class="pre">software</span> <span class="pre">in-service-upgrade</span> <span class="pre">&lt;path-to-image&gt;</span></code> command.</p>
 <p>For more information, see Chapter 2 of the Juniper QFX5100 Series book
-<a class="footnote-reference brackets" href="#f1" id="id5">1</a>.</p>
+<a class="footnote-reference" href="#f1" id="id5">[1]</a>.</p>
 </div>
 <div class="section" id="monitoring">
 <span id="id6"></span><h2>Monitoring<a class="headerlink" href="#monitoring" title="Permalink to this headline">¶</a></h2>
@@ -196,8 +198,8 @@ lower traffic interfaces.</p>
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">polling-interval</span></code> tells Junos how frequently, in seconds, to
+<p class="first admonition-title">Note</p>
+<p class="last">The <code class="docutils literal notranslate"><span class="pre">polling-interval</span></code> tells Junos how frequently, in seconds, to
 poll for data; the <code class="docutils literal notranslate"><span class="pre">sampling-rate</span></code> tells Junos how many packets to
 sample.</p>
 </div>
@@ -209,17 +211,17 @@ poll as frequently as every 8ms, and data is exported as soon as it is
 collected.  You can set thresholds on-box down to 1ns.  Enhanced
 Analytics can monitor:</p>
 <ul class="simple">
-<li><p>Traffic statistics</p></li>
-<li><p>Queue depth</p></li>
-<li><p>Latency</p></li>
-<li><p>Jitter</p></li>
+<li>Traffic statistics</li>
+<li>Queue depth</li>
+<li>Latency</li>
+<li>Jitter</li>
 </ul>
 <p>This data can be streamed using the following formats:</p>
 <ul class="simple">
-<li><p>Protobuf</p></li>
-<li><p>JSON</p></li>
-<li><p>CSV</p></li>
-<li><p>TSV</p></li>
+<li>Protobuf</li>
+<li>JSON</li>
+<li>CSV</li>
+<li>TSV</li>
 </ul>
 <p>Enhanced Analytics is performed by two systems: the Analytics Daemon and
 the Analytics Manager.</p>
@@ -229,19 +231,26 @@ Analytics Manager’s ring buffers and exports it to collectors.</p>
 placed into ring buffers for <code class="docutils literal notranslate"><span class="pre">analyticsd</span></code> to collect.</p>
 <p>TODO: Add configuration examples for Enhanced Analytics.</p>
 <p>For more information, see Chapter 9 of the Juniper QFX5100 Series book
-<a class="footnote-reference brackets" href="#f1" id="id8">1</a>.</p>
+<a class="footnote-reference" href="#f1" id="id8">[1]</a>.</p>
 <p class="rubric">Footnotes</p>
-<dl class="footnote brackets">
-<dt class="label" id="f1"><span class="brackets">1</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id5">2</a>,<a href="#id8">3</a>)</span></dt>
-<dd><p><a class="reference external" href="https://www.amazon.com/Juniper-QFX5100-Comprehensive-Building-Next-Generation/dp/1491949570/">Juniper QFX5100 Series</a></p>
-</dd>
-<dt class="label" id="f2"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
-<dd><p><a class="reference external" href="https://www.juniper.net/documentation/en_US/junos/topics/concept/issu-on-qfx5100-overview.html">Understanding In-Service Software Upgrade (ISSU)</a></p>
-</dd>
-<dt class="label" id="f3"><span class="brackets">3</span><span class="fn-backref">(<a href="#id3">1</a>,<a href="#id4">2</a>)</span></dt>
-<dd><p><a class="reference external" href="https://www.juniper.net/documentation/en_US/junos/topics/task/installation/issu-upgrading-qfx5100.html">Performing an In-Service Software Upgrade (ISSU) with Non-Stop Routing</a></p>
-</dd>
-</dl>
+<table class="docutils footnote" frame="void" id="f1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[1]</td><td><em>(<a class="fn-backref" href="#id1">1</a>, <a class="fn-backref" href="#id5">2</a>, <a class="fn-backref" href="#id8">3</a>)</em> <a class="reference external" href="https://www.amazon.com/Juniper-QFX5100-Comprehensive-Building-Next-Generation/dp/1491949570/">Juniper QFX5100 Series</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="f2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td><a class="reference external" href="https://www.juniper.net/documentation/en_US/junos/topics/concept/issu-on-qfx5100-overview.html">Understanding In-Service Software Upgrade (ISSU)</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="f3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[3]</td><td><em>(<a class="fn-backref" href="#id3">1</a>, <a class="fn-backref" href="#id4">2</a>)</em> <a class="reference external" href="https://www.juniper.net/documentation/en_US/junos/topics/task/installation/issu-upgrading-qfx5100.html">Performing an In-Service Software Upgrade (ISSU) with Non-Stop Routing</a></td></tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
@@ -301,6 +310,8 @@ placed into ring buffers for <code class="docutils literal notranslate"><span cl
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
@@ -321,7 +332,7 @@ placed into ring buffers for <code class="docutils literal notranslate"><span cl
       &copy;2019, Tyler Christiansen.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

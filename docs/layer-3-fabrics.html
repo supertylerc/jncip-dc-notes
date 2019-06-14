@@ -1,9 +1,11 @@
 
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Layer 3 Fabrics &#8212; jncip-dc-notes  documentation</title>
     <link rel="stylesheet" href="static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
@@ -36,10 +38,10 @@
 <span id="id1"></span><h1>Layer 3 Fabrics<a class="headerlink" href="#layer-3-fabrics" title="Permalink to this headline">¶</a></h1>
 <p>This blueprint item primarily covers the following topics:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#clos"><span class="std std-ref">3-Stage Clos Architecture</span></a></p></li>
-<li><p><a class="reference internal" href="#ip-fabric-routing"><span class="std std-ref">IP Fabric Routing</span></a></p></li>
-<li><p><a class="reference internal" href="#ip-fabric-scaling"><span class="std std-ref">IP Fabric Scaling</span></a></p></li>
-<li><p><a class="reference internal" href="#best-practices"><span class="std std-ref">IP Fabric Best Practices</span></a></p></li>
+<li><a class="reference internal" href="#clos"><span class="std std-ref">3-Stage Clos Architecture</span></a></li>
+<li><a class="reference internal" href="#ip-fabric-routing"><span class="std std-ref">IP Fabric Routing</span></a></li>
+<li><a class="reference internal" href="#ip-fabric-scaling"><span class="std std-ref">IP Fabric Scaling</span></a></li>
+<li><a class="reference internal" href="#best-practices"><span class="std std-ref">IP Fabric Best Practices</span></a></li>
 </ul>
 <div class="section" id="stage-clos-architecture">
 <span id="clos"></span><h2>3-Stage Clos Architecture<a class="headerlink" href="#stage-clos-architecture" title="Permalink to this headline">¶</a></h2>
@@ -89,11 +91,11 @@ at the spine level must support and be configured for BGP ADD-PATH.</p>
 this design, each leaf node is given a unique ASN and all spines either
 share the same ASN or have unique ASNs per node.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The QFX5100 Series book <a class="footnote-reference brackets" href="#f1" id="id5">1</a>, particularly Chapter 7: IP Fabrics
+<p class="first admonition-title">Note</p>
+<p class="last">The QFX5100 Series book <a class="footnote-reference" href="#f1" id="id5">[1]</a>, particularly Chapter 7: IP Fabrics
 (Clos), seems to suggest that the spine switches should each have a
-unique ASN.  However, multiple other sources such as RFC7938 <a class="footnote-reference brackets" href="#f2" id="id6">2</a>
-and BGP in the Data Center <a class="footnote-reference brackets" href="#f3" id="id7">3</a> suggest giving the spines the same
+unique ASN.  However, multiple other sources such as RFC7938 <a class="footnote-reference" href="#f2" id="id6">[2]</a>
+and BGP in the Data Center <a class="footnote-reference" href="#f3" id="id7">[3]</a> suggest giving the spines the same
 ASN while allowing the leafs to have unique ASNs.  This is likely to
 avoid the nead for <code class="docutils literal notranslate"><span class="pre">multipath</span> <span class="pre">multiple-as</span></code> on every leaf and to
 simplify spine configuration.  However, even following this numbering
@@ -115,8 +117,8 @@ ASN instead of a unique ASN per spine switch, the number of places that
 require <code class="docutils literal notranslate"><span class="pre">multipath</span> <span class="pre">multiple-as</span></code> might be reduced depending on your
 design and requirements.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p><code class="docutils literal notranslate"><span class="pre">multipath</span> <span class="pre">multiple-as</span></code> is recommended on all nodes.  You <em>can</em> get
+<p class="first admonition-title">Note</p>
+<p class="last"><code class="docutils literal notranslate"><span class="pre">multipath</span> <span class="pre">multiple-as</span></code> is recommended on all nodes.  You <em>can</em> get
 away with only deploying it in certain places, but that doesn’t mean
 you should.  One of the benefits of deploying an IP fabric is
 reproducibility, and when you start tailoring to such a degree, it
@@ -129,9 +131,9 @@ because they can no longer assume similar behavior amongst nodes.</p>
 <span id="id8"></span><h2>IP Fabric Scaling<a class="headerlink" href="#ip-fabric-scaling" title="Permalink to this headline">¶</a></h2>
 <p>The scalability of an IP fabric is largely limited by three things:</p>
 <ul class="simple">
-<li><p>the acceptable oversubscription ratio</p></li>
-<li><p>the number of uplinks available per leaf per pod</p></li>
-<li><p>the number of ports per spine per pod</p></li>
+<li>the acceptable oversubscription ratio</li>
+<li>the number of uplinks available per leaf per pod</li>
+<li>the number of ports per spine per pod</li>
 </ul>
 <p>The acceptable oversubscription ratio can determine both how many
 servers you attach to a leaf and how many spines you need to have, both
@@ -144,8 +146,8 @@ oversubscription.  In this case, you can either select a leaf switch
 with more 40G uplinks (and add more spine swithces), or you can decide
 that you will not attach any servers to half of the 10G ports.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>You can get clever and, if your switch supports it, break out all of
+<p class="first admonition-title">Note</p>
+<p class="last">You can get clever and, if your switch supports it, break out all of
 the 40G ports to 10G ports.  Then use only 10G spines.  Split your
 total 10G ports in half; this number is the number of spines you
 need.  For example, given the same leaf port density above and
@@ -192,8 +194,8 @@ words, it’s okay if your spines and leafs are different models, but all
 of your spines should be the same model, and all of your leafs should be
 the same model.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p><em>Technically</em> you aren’t limited by the number of ports.  However,
+<p class="first admonition-title">Note</p>
+<p class="last"><em>Technically</em> you aren’t limited by the number of ports.  However,
 this section is all about best practices.  So, in the spirit of best
 practices, don’t try to mix and match models in the same pod.</p>
 </div>
@@ -215,22 +217,29 @@ of your fabric switches but not others.</p>
 </div>
 <div class="section" id="configuration">
 <h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
-<dl class="simple">
-<dt>TODO: Add configuration examples for an IGP with iBGP, eBGP with iBGP,</dt><dd><p>and straight eBGP.</p>
-</dd>
+<dl class="docutils">
+<dt>TODO: Add configuration examples for an IGP with iBGP, eBGP with iBGP,</dt>
+<dd>and straight eBGP.</dd>
 </dl>
 <p class="rubric">Footnotes</p>
-<dl class="footnote brackets">
-<dt class="label" id="f1"><span class="brackets"><a class="fn-backref" href="#id5">1</a></span></dt>
-<dd><p><a class="reference external" href="https://www.amazon.com/Juniper-QFX5100-Comprehensive-Building-Next-Generation/dp/1491949570/">Juniper QFX5100 Series</a></p>
-</dd>
-<dt class="label" id="f2"><span class="brackets"><a class="fn-backref" href="#id6">2</a></span></dt>
-<dd><p><a class="reference external" href="https://tools.ietf.org/html/rfc7938#section-5.2">RFC7938: Use of BGP in Large-Scale Data Centers, Section 5.2: EBGP Configuration for Clos Topology</a></p>
-</dd>
-<dt class="label" id="f3"><span class="brackets"><a class="fn-backref" href="#id7">3</a></span></dt>
-<dd><p><a class="reference external" href="https://learning.oreilly.com/library/view/bgp-in-the/9781491983416/">BGP in the Data Center, Chapter 2, ASN Numbering Model</a></p>
-</dd>
-</dl>
+<table class="docutils footnote" frame="void" id="f1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id5">[1]</a></td><td><a class="reference external" href="https://www.amazon.com/Juniper-QFX5100-Comprehensive-Building-Next-Generation/dp/1491949570/">Juniper QFX5100 Series</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="f2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id6">[2]</a></td><td><a class="reference external" href="https://tools.ietf.org/html/rfc7938#section-5.2">RFC7938: Use of BGP in Large-Scale Data Centers, Section 5.2: EBGP Configuration for Clos Topology</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="f3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id7">[3]</a></td><td><a class="reference external" href="https://learning.oreilly.com/library/view/bgp-in-the/9781491983416/">BGP in the Data Center, Chapter 2, ASN Numbering Model</a></td></tr>
+</tbody>
+</table>
 </div>
 </div>
 
@@ -290,6 +299,8 @@ of your fabric switches but not others.</p>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
@@ -310,7 +321,7 @@ of your fabric switches but not others.</p>
       &copy;2019, Tyler Christiansen.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
