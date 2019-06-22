@@ -31,7 +31,7 @@ build: clean html pdf
 	echo "jncip-dc.tylerc.me" > docs/CNAME
 
 publish: build
-	[ "$(TRAVIS_PULL_REQUEST_BRANCH)" ] && exit 0
+	[ "$(TRAVIS_PULL_REQUEST_BRANCH)" ] && exit 0 || true
 	git add .
 	git commit -m "publish version: $(TRAVIS_COMMIT)"
 
