@@ -5,6 +5,9 @@ python:
 cache: pip
 script:
   - make publish
+branches:
+  only:
+    - master
 deploy:
   provider: pages
   target_branch: master
