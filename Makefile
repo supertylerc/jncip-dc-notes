@@ -13,6 +13,9 @@ help:
 
 .PHONY: help Makefile
 
+prepare:
+	mv docs/jncip-dc-notes.pdf ./jncip-dc-notes.pdf
+
 clean:
 	rm -rf _build/*
 	rm -rf docs/*
@@ -25,10 +28,11 @@ html:
 
 pdf:
 	@$(SPHINXBUILD) -M rinoh "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
-	[ `du -k "_build/rinoh/jncip-dc-notes.pdf"` -eq `du -k "docs/jncip-dc-notes.pdf"` ] && exit 0
+	mv jncip-dc-notes.pdf docs/jncip-dc-notes.pdf || true
+	[ `du -k "_build/rinoh/jncip-dc-notes.pdf"` -eq `du -k "docs/jncip-dc-notes.pdf"` ] && exit 0 || true
 	mv _build/rinoh/jncip-dc-notes.pdf docs/
 
-publish: clean html pdf
+publish: prepare clean html pdf
 	echo "jncip-dc.tylerc.me" > docs/CNAME
 
 # Catch-all target: route all unknown targets to Sphinx using the new
