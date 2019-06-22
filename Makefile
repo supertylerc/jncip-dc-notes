@@ -13,15 +13,16 @@ help:
 
 .PHONY: help Makefile
 
-html:
+clean:
 	rm -rf _build/*
+	rm -rf docs/*
+html:
 	@$(SPHINXBUILD) -M html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 pdf:
-	@$(SPHINXBUILD) -M pdf "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+	@$(SPHINXBUILD) -M rinoh "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
-publish: html pdf
-	rm -rf docs/*
+publish: clean html pdf
 	mv _build/html/* docs/
 	mv docs/_static docs/static
 	mv _build/pdf/* docs/
