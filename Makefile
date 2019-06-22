@@ -13,23 +13,27 @@ help:
 
 .PHONY: help Makefile
 
-html:
+clean:
 	rm -rf _build/*
-	@$(SPHINXBUILD) -M html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
-
-pdf:
-	@$(SPHINXBUILD) -M pdf "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
-
-publish: html pdf
 	rm -rf docs/*
+html:
+	@$(SPHINXBUILD) -M html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 	mv _build/html/* docs/
 	mv docs/_static docs/static
-	mv _build/pdf/* docs/
 	for i in `ls docs/*.html`; do sed -i -e 's/_static/static/g' $$i; done
 	for i in `ls docs/*.html`; do sed -i -e 's,static/jquery.js,https://code.jquery.com/jquery-3.4.1.min.js,g' $$i; done
+
+pdf:
+	@$(SPHINXBUILD) -M rinoh "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+	mv _build/rinoh/jncip-dc-notes.pdf docs/
+
+build: clean html pdf
 	echo "jncip-dc.tylerc.me" > docs/CNAME
+
+publish: build
+	[ "$(TRAVIS_PULL_REQUEST_BRANCH)" ] && exit 0
 	git add .
-	git commit
+	git commit -m "publish version: $(TRAVIS_COMMIT)"
 
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).

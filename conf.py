@@ -27,7 +27,7 @@ description = 'JNCIP-DC Study Notes'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc', 'rst2pdf.pdfbuilder']
+extensions = ['sphinx.ext.autodoc', 'rinoh.frontend.sphinx']
 
 master_doc = 'index'
 
@@ -53,3 +53,10 @@ html_theme = 'alabaster'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['static']
+
+latex_elements = {
+    'papersize': 'letterpaper',
+    'pointsize': '10pt',
+    'preamble': '',
+    'figure_align': 'htbp'
+}
