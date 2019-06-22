@@ -4,7 +4,7 @@ python:
   - "3.6"
 cache: pip
 script:
-  - [ "${TRAVIS_COMMIT_MESSAGE#*Deploy}" != "$TRAVIS_COMMIT_MESSAGE" ] && exit 0 || make publish
+  - [[ "${TRAVIS_COMMIT_MESSAGE#*Deploy}" != "$TRAVIS_COMMIT_MESSAGE" ]] && exit 0 || make publish
 branches:
   only:
     - master
