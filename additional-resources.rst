@@ -151,6 +151,7 @@ The following guides will also be useful:
 - `EVPN Feature Guide <https://www.juniper.net/documentation/en_US/junos/information-products/pathway-pages/junos-sdn/evpn-vxlan.html>`_
 - `Cloud Data Center Architecture Guide <https://www.juniper.net/documentation/en_US/release-independent/solutions/information-products/pathway-pages/sg-005-cloud-data-center.html>`_
 - `EVPN LAG Multihoming in EVPN-VXLAN Cloud Data Center Infrastructures <https://www.juniper.net/documentation/en_US/release-independent/solutions/information-products/pathway-pages/evpn-lag-multihoming-guide/evpn-lag-multihoming-guide.html>`_
+- `Juniper Networks EVPN Implementation for Next-Generation Architectures <https://juniper.net/assets/us/en/local/pdf/whitepapers/2000606-en.pdf>`_
 
 For blog posts, we again have a large number of posts to dive into:
 
