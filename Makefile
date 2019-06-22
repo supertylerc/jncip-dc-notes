@@ -27,10 +27,13 @@ pdf:
 	@$(SPHINXBUILD) -M rinoh "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 	mv _build/rinoh/jncip-dc-notes.pdf docs/
 
-publish: clean html pdf
+build: clean html pdf
 	echo "jncip-dc.tylerc.me" > docs/CNAME
+
+publish: build
+	[ "$(TRAVIS_PULL_REQUEST_BRANCH)" ] && exit 0
 	git add .
-	git commit
+	git commit -m "publish version: $(TRAVIS_COMMIT)"
 
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
