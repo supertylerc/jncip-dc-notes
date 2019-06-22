@@ -25,13 +25,11 @@ html:
 
 pdf:
 	@$(SPHINXBUILD) -M rinoh "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
-	[ `du -k "_buid/rinoh/jncip-dc-notes.pdf"` -eq `du -k "docs/jncip-dc-notes.pdf"` ] && exit 0
+	[ `du -k "_build/rinoh/jncip-dc-notes.pdf"` -eq `du -k "docs/jncip-dc-notes.pdf"` ] && exit 0
 	mv _build/rinoh/jncip-dc-notes.pdf docs/
 
-build: clean html pdf
+publish: clean html pdf
 	echo "jncip-dc.tylerc.me" > docs/CNAME
-
-publish: build
 
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
