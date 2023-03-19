@@ -1,3 +1,9 @@
+# UNMAINTAINED
+
+Some of these notes are probably still valid, at least to some degree.
+However, the exam has changed significantly since this was written.  I
+don't have the time to maintain these notes, so I'm archiving the repo.
+
 # jncip-dc-notes
 
 This repository contains both the source and the compiled HTML for
